@@ -29,16 +29,17 @@ import { InstancedMesh } from '@/engine/renderer/instanced-mesh';
 import { doTimes } from '@/engine/helpers';
 import { findFloorHeightAtPosition } from '@/engine/physics/surface-collision';
 import { largeLeaves, largeTree, leavesMesh, plant1 } from '@/modeling/flora';
+import { ThirdPersonPlayer } from '@/third-person-player';
 
 class GameState implements State {
-  player: FirstPersonPlayer;
+  player: ThirdPersonPlayer;
   scene: Scene;
   groupedFaces?: {floorFaces: Face[], wallFaces: Face[], ceilingFaces: Face[]};
 
   constructor() {
     const camera = new Camera(Math.PI / 3, 16 / 9, 1, 400);
     camera.position = new EnhancedDOMPoint(0, 5, -17);
-    this.player = new FirstPersonPlayer(camera);
+    this.player = new ThirdPersonPlayer(camera);
     this.scene = new Scene();
 
     const sampleHeightMap: number[] = [];
