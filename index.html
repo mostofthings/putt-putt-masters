@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>TypeScript Template</title>
+    <style>
+        #c {
+            width: min(100vw, calc(100vh * 16/9));
+            image-rendering: pixelated;
+        }
+
+        /* Get rid of any margins, set background black, use flexbox to center */
+        html, body {
+            margin: 0;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+<div id="debug" style="color: white; position: absolute;"></div>
+    <canvas id="c"></canvas>
+</body>
