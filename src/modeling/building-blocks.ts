@@ -1,14 +1,11 @@
-import { MakeMoldable } from '@/engine/moldable';
-import { CubeGeometry } from '@/engine/cube-geometry';
-
-const MoldableCube = MakeMoldable(CubeGeometry);
+import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
 
 export function createHallway(width: number, height: number, depth: number, widthSegments: number, heightSegments: number, depthSegments: number, spacing: number) {
   const isHorizontal = width >= depth;
-  const wallGeometry2 = new MoldableCube(width, height, depth, widthSegments, heightSegments, depthSegments)
+  const wallGeometry2 = new MoldableCubeGeometry(width, height, depth, widthSegments, heightSegments, depthSegments)
     .translate(isHorizontal ? 0 : spacing, 0, isHorizontal ? spacing : 0);
 
-  return new MoldableCube(width, height, depth, widthSegments, heightSegments, depthSegments)
+  return new MoldableCubeGeometry(width, height, depth, widthSegments, heightSegments, depthSegments)
     .translate(isHorizontal ? 0 : -spacing, 0, isHorizontal ? -spacing : 0)
     .merge(wallGeometry2)
     .computeNormalsPerPlane()

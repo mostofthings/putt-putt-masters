@@ -17,9 +17,9 @@ class Controls {
     document.addEventListener('keydown', event => this.toggleKey(event, true));
     document.addEventListener('keyup', event => this.toggleKey(event, false));
     const canvas = document.querySelector('#c')!;
-    canvas.addEventListener('click', () => {
-      canvas.requestPointerLock();
-    });
+    // canvas.addEventListener('click', () => {
+    //   canvas.requestPointerLock();
+    // });
     document.addEventListener('mousemove', event => {
       this.mouseMovement.x = event.movementX;
       this.mouseMovement.y = event.movementY;
