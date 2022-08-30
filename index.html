@@ -1,11 +1,10 @@
-<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <title>TypeScript Template</title>
     <style>
-        #c {
+        canvas {
             width: min(100vw, calc(100vh * 16/9));
-            image-rendering: pixelated;
+            position: absolute;
         }
 
         /* Get rid of any margins, set background black, use flexbox to center */
@@ -21,6 +20,7 @@
 </head>
 
 <body>
-<div id="debug" style="color: white; position: absolute;"></div>
-    <canvas id="c"></canvas>
+<div id="debug" style="position: fixed; top: 20px; left: 20px; color: white; white-space: pre;"></div>
+<canvas id="c"></canvas>
+<canvas id="oc" width="1280" height="720"></canvas>
 </body>

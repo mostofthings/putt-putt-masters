@@ -1,6 +1,13 @@
 class DrawEngine {
   private _context?: CanvasRenderingContext2D | null;
 
+
+
+  constructor() {
+    this._context = document.querySelector<HTMLCanvasElement>('#oc')!.getContext('2d')!;
+  }
+
+
   get context(): CanvasRenderingContext2D {
     if (!this._context) {
       throw new Error('must call initializeDrawEngine first');
