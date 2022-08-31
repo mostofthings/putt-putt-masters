@@ -51,15 +51,19 @@ class Controls {
   private toggleKey(event: KeyboardEvent, isPressed: boolean) {
     switch (event.code) {
       case 'KeyW':
+      case 'ArrowUp':
         this.isUp = isPressed;
         break;
       case 'KeyS':
+      case 'ArrowDown':
         this.isDown = isPressed;
         break;
       case 'KeyA':
+      case 'ArrowLeft':
         this.isLeft = isPressed;
         break;
       case 'KeyD':
+      case 'ArrowRight':
         this.isRight = isPressed;
         break;
       case 'Enter':
