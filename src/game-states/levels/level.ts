@@ -1,6 +1,5 @@
 import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 import {Mesh} from "@/engine/renderer/mesh";
-import {LevelCallback} from '@/game-states/levels/level-callback';
 import {Scene} from "@/engine/renderer/scene";
 import {Face} from "@/engine/physics/face";
 
