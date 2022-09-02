@@ -12,6 +12,9 @@ import { menuState } from '@/game-states/menu-state';
 import { ThirdPersonPlayer } from '@/third-person-player';
 import {Level} from "@/game-states/levels/level";
 import {LevelCallback} from "@/game-states/levels/level-callback";
+import {findFloorHeightAtPosition, findWallCollisionsFromList} from "@/engine/physics/surface-collision";
+import {GroupedFaces} from "@/engine/grouped-faces";
+import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 
 class GameState implements State {
   player: ThirdPersonPlayer;
@@ -52,11 +55,14 @@ class GameState implements State {
 
   onUpdate(timeElapsed: number): void {
     this.player.update(this.level.groupedFaces!);
-
-    // particle.lookAt(this.player.camera.position);
-    // particle2.lookAt(this.player.camera.position);
-    // particle.rotate(-1, 0, 0);
-    // particle2.rotate(-1, 0, 0);
+    // player collision call
+    const collisionDepth = this.collideWithLevel(
+      this.level.groupedFaces,
+      this.player.feetCenter,
+      this.player.collisionOffsetY,
+      this.player.collisionRadius
+    )
+    this.player.updatePositionFromCollision(collisionDepth)
 
     this.level.scene.updateWorldMatrix();
 
@@ -65,6 +71,25 @@ class GameState implements State {
     if (controls.isEscape) {
       getGameStateMachine().setState(menuState);
     }
+  }
+
+  collideWithLevel(
+    groupedFaces: GroupedFaces,
+    feetCenter: EnhancedDOMPoint,
+    offsetY: number,
+    radius: number,
+    ): number | undefined {
+    const wallCollisions = findWallCollisionsFromList(groupedFaces.wallFaces, feetCenter, offsetY, radius);
+    feetCenter.x += wallCollisions.xPush;
+    feetCenter.z += wallCollisions.zPush;
+
+    const floorData = findFloorHeightAtPosition(groupedFaces!.floorFaces, feetCenter);
+
+    if (!floorData) {
+      return;
+    }
+
+    return floorData.height - feetCenter.y;
   }
 }
 
