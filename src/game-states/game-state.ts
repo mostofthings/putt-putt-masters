@@ -1,37 +1,17 @@
 import { State } from '@/core/state';
 import { audioCtx, getAudioPlayer, panner } from '@/engine/audio/audio-player';
 import { Skybox } from '@/skybox';
-import {
-  drawBricks, drawCurrentTexture,
-  drawGrass,
-  drawLandscape,
-  drawMarble, drawParticle,
-  drawSky,
-  drawWater, materials, skyboxes,
-} from '@/texture-maker';
+import { skyboxes,} from '@/texture-maker';
 import { Scene } from '@/engine/renderer/scene';
 import { Camera } from '@/engine/renderer/camera';
-import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
-import { textureLoader } from '@/engine/renderer/texture-loader';
-import { Mesh } from '@/engine/renderer/mesh';
-import { PlaneGeometry } from '@/engine/plane-geometry';
-import { Material } from '@/engine/renderer/material';
-import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
-import { AttributeLocation, renderer } from '@/engine/renderer/renderer';
-import { getGroupedFaces } from '@/engine/physics/parse-faces';
+import { renderer } from '@/engine/renderer/renderer';
 import { Face } from '@/engine/physics/face';
 import { controls } from '@/core/controls';
 import { getGameStateMachine } from '@/game-state-machine';
 import { menuState } from '@/game-states/menu-state';
-import { Object3d } from '@/engine/renderer/object-3d';
-import { FirstPersonPlayer } from '@/first-person-player';
-import { InstancedMesh } from '@/engine/renderer/instanced-mesh';
-import { doTimes } from '@/engine/helpers';
-import { findFloorHeightAtPosition } from '@/engine/physics/surface-collision';
-import { largeLeaves, largeTree, leavesMesh, plant1 } from '@/modeling/flora';
 import { ThirdPersonPlayer } from '@/third-person-player';
-import {LevelCallback} from "@/game-states/levels/level-callback";
 import {Level} from "@/game-states/levels/level";
+import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 
 class GameState implements State {
   player: ThirdPersonPlayer;
@@ -47,8 +27,10 @@ class GameState implements State {
 
   onEnter(level: Level) {
     this.camera.position = level.cameraPosition;
-    this.player.mesh.position = level.respawnPoint;
-    this.player.mesh.position.y = 1.5;
+    this.player.respawnCameraPosition.set(level.cameraPosition);
+    this.player.respawnPoint.set(level.respawnPoint);
+
+    this.player.respawn();
 
     const { scene, groupedFaces } = level.sceneCallback();
     this.scene = scene;

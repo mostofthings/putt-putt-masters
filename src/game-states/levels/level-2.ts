@@ -14,7 +14,7 @@ import {InstancedMesh} from "@/engine/renderer/instanced-mesh";
 import {Level} from "@/game-states/levels/level";
 
 const holePosition = new EnhancedDOMPoint();
-const respawnPoint = new EnhancedDOMPoint(0,0,0);
+const respawnPoint = new EnhancedDOMPoint(40,2,40);
 const cameraPosition = new EnhancedDOMPoint(0,5,-17);
 
 function sceneCallback() {

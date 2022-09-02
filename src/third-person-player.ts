@@ -16,6 +16,8 @@ const debugElement = document.querySelector('#debug')!;
 export class ThirdPersonPlayer {
   isJumping = false;
   feetCenter = new EnhancedDOMPoint(0, 0, 0);
+  respawnPoint = new EnhancedDOMPoint(0,0,0);
+  respawnCameraPosition = new EnhancedDOMPoint(0,0,0);
   velocity = new EnhancedDOMPoint(0, 0, 0);
   angle = 0;
 
@@ -50,6 +52,13 @@ export class ThirdPersonPlayer {
     this.feetCenter.add(this.velocity);
     this.collideWithLevel(groupedFaces);
 
+    debugElement.textContent = `
+      feet center y: ${this.feetCenter.y}
+      respawn x: ${this.respawnPoint.x}
+      respawn y: ${this.respawnPoint.y}
+      respawn z: ${this.respawnPoint.z}
+      `
+
     this.mesh.position.set(this.feetCenter);
     this.mesh.position.y += 0.5; // move up by half height so mesh ends at feet position
 
@@ -78,6 +87,11 @@ export class ThirdPersonPlayer {
     this.feetCenter.z += wallCollisions.zPush;
 
     const floorData = findFloorHeightAtPosition(groupedFaces!.floorFaces, this.feetCenter);
+
+    if (this.feetCenter.y < -50) {
+      this.respawn();
+    }
+
     if (!floorData) {
       return;
     }
@@ -131,5 +145,11 @@ export class ThirdPersonPlayer {
     this.listener.forwardX.value = x;
     // this.listener.forwardY.value = cameraDireciton.y;
     this.listener.forwardZ.value = z;
+  }
+
+  respawn() {
+    this.mesh.position.set(this.respawnPoint);
+    this.feetCenter.set(this.respawnPoint);
+    this.camera.position.set(this.respawnCameraPosition);
   }
 }
