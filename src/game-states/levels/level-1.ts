@@ -14,11 +14,12 @@ import {InstancedMesh} from "@/engine/renderer/instanced-mesh";
 import {largeTree, leavesMesh, plant1} from "@/modeling/flora";
 import {Level} from "@/game-states/levels/level";
 
-const holePosition = new EnhancedDOMPoint();
-const respawnPoint = new EnhancedDOMPoint(0,1.5,0);
-const cameraPosition = new EnhancedDOMPoint(0,5,-17);
 
-function sceneCallback() {
+export function getLevel1() {
+  const holePosition = new EnhancedDOMPoint();
+  const respawnPoint = new EnhancedDOMPoint(0,1.5,0);
+  const cameraPosition = new EnhancedDOMPoint(0,5,-17);
+
   const scene = new Scene();
 
   const sampleHeightMap: number[] = [];
@@ -168,22 +169,9 @@ function sceneCallback() {
   levelParts.push(particle);
   levelParts.push(particle2);
 
-
-
-
   // scene.add(this.player.mesh);
   scene.add(...levelParts);
 
-  return {
-    scene,
-    groupedFaces,
-  }
+  return new Level(1, holePosition, respawnPoint, cameraPosition, scene, groupedFaces)
 }
 
-export const level1 = new Level(
-  1,
-  holePosition,
-  respawnPoint,
-  cameraPosition,
-  sceneCallback,
-)

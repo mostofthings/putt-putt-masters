@@ -13,11 +13,11 @@ import {findFloorHeightAtPosition} from "@/engine/physics/surface-collision";
 import {InstancedMesh} from "@/engine/renderer/instanced-mesh";
 import {Level} from "@/game-states/levels/level";
 
-const holePosition = new EnhancedDOMPoint();
-const respawnPoint = new EnhancedDOMPoint(40,2,40);
-const cameraPosition = new EnhancedDOMPoint(0,5,-17);
+export function getLevel2() {
+  const holePosition = new EnhancedDOMPoint();
+  const respawnPoint = new EnhancedDOMPoint(40,2,40);
+  const cameraPosition = new EnhancedDOMPoint(0,5,-17);
 
-function sceneCallback() {
   const scene = new Scene();
 
   const sampleHeightMap: number[] = [];
@@ -141,16 +141,5 @@ function sceneCallback() {
   // scene.add(this.player.mesh);
   scene.add(...levelParts);
 
-  return {
-    scene,
-    groupedFaces,
-  }
+  return new Level(2, holePosition, respawnPoint, cameraPosition, scene, groupedFaces)
 }
-
-export const level2 = new Level(
-  2,
-  holePosition,
-  respawnPoint,
-  cameraPosition,
-  sceneCallback,
-)
