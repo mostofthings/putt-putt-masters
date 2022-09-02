@@ -9,17 +9,16 @@ import { controls } from '@/core/controls';
 import { getGameStateMachine } from '@/game-state-machine';
 import { gameState } from '@/game-states/game-state';
 import {drawEngine} from "@/core/draw-engine";
-import {level4} from "@/game-states/levels/level-4";
-import {level3} from "@/game-states/levels/level-3";
-import {level2} from "@/game-states/levels/level-2";
-import {level1} from "@/game-states/levels/level-1";
+import {getLevel2} from "@/game-states/levels/level-2";
+import {getLevel1} from "@/game-states/levels/level-1";
+import {LevelCallback} from "@/game-states/levels/level-callback";
 
 class MenuState implements State {
   scene: Scene;
   camera: Camera;
   selectedOptionIndex = 0;
   isNavigationKeyPressed = false;
-  levels = [level1, level2, level3, level4,]
+  levels: LevelCallback[] = [getLevel1, getLevel2]
 
   constructor() {
     this.scene = new Scene();

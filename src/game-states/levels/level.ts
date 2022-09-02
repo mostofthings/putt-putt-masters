@@ -2,13 +2,15 @@ import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 import {Mesh} from "@/engine/renderer/mesh";
 import {Scene} from "@/engine/renderer/scene";
 import {Face} from "@/engine/physics/face";
+import {GroupedFaces} from "@/engine/grouped-faces";
 
 export class Level {
   levelNumber: number;
   holePosition: EnhancedDOMPoint;
   respawnPoint: EnhancedDOMPoint;
   cameraPosition: EnhancedDOMPoint;
-  sceneCallback: () => { scene: Scene, groupedFaces: {floorFaces: Face[], wallFaces: Face[], ceilingFaces: Face[]} };
+  scene: Scene;
+  groupedFaces: GroupedFaces;
   meshesToRender?: Mesh[];
   meshesToCollide?: Mesh[];
 
@@ -18,13 +20,15 @@ export class Level {
       holePosition: EnhancedDOMPoint,
       respawnPoint: EnhancedDOMPoint,
       cameraPosition: EnhancedDOMPoint,
-      sceneCallback: () => { scene: Scene, groupedFaces: {floorFaces: Face[], wallFaces: Face[], ceilingFaces: Face[]} },
+      scene: Scene,
+      groupedFaces: GroupedFaces,
     ) {
 
     this.levelNumber = levelNumber;
     this.holePosition = holePosition;
     this.respawnPoint = respawnPoint;
     this.cameraPosition = cameraPosition;
-    this.sceneCallback = sceneCallback;
+    this.scene = scene;
+    this.groupedFaces = groupedFaces;
   }
 }
