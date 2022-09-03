@@ -87,10 +87,7 @@ class GameState implements State {
     `
 
     if (Math.abs(this.player.feetCenter.x) > 20 || Math.abs(this.player.feetCenter.z) > 20) {
-      const levelNumber = this.level.levelNumber;
-      this.deathCount[levelNumber] += 1;
-      this.deadBodies[this.deathCount[levelNumber] - 1].position.set(this.player.feetCenter)
-      this.player.respawn();
+      this.killPlayer();
     }
 
     this.level.scene.updateWorldMatrix();
@@ -119,6 +116,14 @@ class GameState implements State {
     }
 
     return floorData.height - feetCenter.y;
+  }
+
+  private killPlayer() {
+    const levelNumber = this.level.levelNumber;
+    this.deathCount[levelNumber] += 1;
+    this.deadBodies[this.deathCount[levelNumber] - 1].position.set(this.player.feetCenter)
+    this.deadBodies[this.deathCount[levelNumber] - 1].position.y += .5;
+    this.player.respawn();
   }
 
   get totalDeaths() {
