@@ -5,10 +5,8 @@ import { controls } from '@/core/controls';
 import { Mesh } from '@/engine/renderer/mesh';
 import { textureLoader } from '@/engine/renderer/texture-loader';
 import { drawVolcanicRock } from '@/texture-maker';
-import { MoldableCubeGeometry } from '@/engine/moldable-cube-geometry';
-import { Material } from '@/engine/renderer/material';
-import { findFloorHeightAtPosition, findWallCollisionsFromList } from '@/engine/physics/surface-collision';
 import { audioCtx } from '@/engine/audio/audio-player';
+import {GolfBallMan} from "@/modeling/golf-ball-man";
 
 const debugElement = document.querySelector('#debug')!;
 
@@ -16,6 +14,8 @@ const debugElement = document.querySelector('#debug')!;
 export class ThirdPersonPlayer {
   isJumping = false;
   feetCenter = new EnhancedDOMPoint(0, 0, 0);
+  collisionOffsetY = .4;
+  collisionRadius = .1
   respawnPoint = new EnhancedDOMPoint(0,0,0);
   respawnCameraPosition = new EnhancedDOMPoint(0,0,0);
   velocity = new EnhancedDOMPoint(0, 0, 0);
@@ -31,10 +31,7 @@ export class ThirdPersonPlayer {
 
   constructor(camera: Camera) {
     textureLoader.load(drawVolcanicRock())
-    this.mesh = new Mesh(
-      new MoldableCubeGeometry(0.3, 1, 0.3),
-      new Material({color: '#f0f'})
-    );
+    this.mesh = new GolfBallMan();
     this.feetCenter.y = 10;
     this.camera = camera;
     this.listener = audioCtx.listener;
@@ -48,16 +45,8 @@ export class ThirdPersonPlayer {
 
   update(groupedFaces: { floorFaces: Face[]; wallFaces: Face[] }) {
     this.updateVelocityFromControls();
-    this.velocity.y -= 0.003; // gravity
-    this.feetCenter.add(this.velocity);
-    this.collideWithLevel(groupedFaces);
 
-    debugElement.textContent = `
-      feet center y: ${this.feetCenter.y}
-      respawn x: ${this.respawnPoint.x}
-      respawn y: ${this.respawnPoint.y}
-      respawn z: ${this.respawnPoint.z}
-      `
+    this.feetCenter.add(this.velocity);
 
     this.mesh.position.set(this.feetCenter);
     this.mesh.position.y += 0.5; // move up by half height so mesh ends at feet position
@@ -79,30 +68,6 @@ export class ThirdPersonPlayer {
     this.camera.updateWorldMatrix();
 
     this.updateAudio()
-  }
-
-  collideWithLevel(groupedFaces: {floorFaces: Face[], wallFaces: Face[]}) {
-    const wallCollisions = findWallCollisionsFromList(groupedFaces.wallFaces, this.feetCenter, 0.4, 0.1);
-    this.feetCenter.x += wallCollisions.xPush;
-    this.feetCenter.z += wallCollisions.zPush;
-
-    const floorData = findFloorHeightAtPosition(groupedFaces!.floorFaces, this.feetCenter);
-
-    if (this.feetCenter.y < -50) {
-      this.respawn();
-    }
-
-    if (!floorData) {
-      return;
-    }
-
-    const collisionDepth = floorData.height - this.feetCenter.y;
-
-    if (collisionDepth > 0) {
-      this.feetCenter.y += collisionDepth;
-      this.velocity.y = 0;
-      this.isJumping = false;
-    }
   }
 
   protected updateVelocityFromControls() {
@@ -127,6 +92,15 @@ export class ThirdPersonPlayer {
         this.velocity.y = 0.15;
         this.isJumping = true;
       }
+    }
+    this.velocity.y -= 0.003; // gravity
+  }
+
+  updatePositionFromCollision(collisionDepth?: number) {
+    if (collisionDepth && collisionDepth > 0) {
+      this.feetCenter.y += collisionDepth;
+      this.velocity.y = 0;
+      this.isJumping = false;
     }
   }
 
