@@ -13,10 +13,11 @@ import {findFloorHeightAtPosition} from "@/engine/physics/surface-collision";
 import {InstancedMesh} from "@/engine/renderer/instanced-mesh";
 import {largeTree, leavesMesh, plant1} from "@/modeling/flora";
 import {Level} from "@/game-states/levels/level";
+import {getHole} from "@/modeling/hole";
 
 
 export function getLevel1() {
-  const holePosition = new EnhancedDOMPoint();
+  const holePosition = new EnhancedDOMPoint(-2,1.25,15);
   const respawnPoint = new EnhancedDOMPoint(0,1.5,0);
   const cameraPosition = new EnhancedDOMPoint(0,5,-17);
 
@@ -163,7 +164,10 @@ export function getLevel1() {
   const testCube = new MoldableCubeGeometry(3, 3, 3, 1, 1, 1);
   const test = new Mesh(testCube, materials.bricks,);
 
-  const levelParts = [ramp, wall, floor, lake, tree, bridge, test, instancedTest, instancedTest2, treeLeaves];
+  const hole = getHole();
+  hole.position.set(holePosition);
+
+  const levelParts = [ramp, wall, floor, lake, tree, bridge, test, instancedTest, instancedTest2, treeLeaves, hole];
 
   const groupedFaces = getGroupedFaces([ramp, wall, floor, lake]);
   levelParts.push(particle);

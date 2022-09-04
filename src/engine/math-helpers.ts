@@ -25,3 +25,8 @@ export function calculateVertexNormals(points: EnhancedDOMPoint[], indices: numb
 
   return vertexNormals.map(vector => vector.normalize());
 }
+
+export function isPointInRadius(pointToEval: EnhancedDOMPoint, centerPoint: EnhancedDOMPoint, radius: number): boolean {
+  const distance = new EnhancedDOMPoint().subtractVectors(pointToEval, centerPoint).magnitude;
+  return distance < radius
+}

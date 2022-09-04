@@ -5,8 +5,16 @@ import {Material} from "@/engine/renderer/material";
 
 export class GolfBallMan extends Mesh {
   constructor() {
-    super(  new MoldableCubeGeometry(0.3, 1, 0.3),
+    super(  getBallBody(),
       new Material({color: '#fff'}))
   }
+
+}
+
+function getBallBody() {
+  return new MoldableCubeGeometry(1,1,1, 4,4,4)
+    .spherify(.5)
+    .computeNormalsCrossPlane()
+    .done()
 }
 

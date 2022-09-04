@@ -12,17 +12,21 @@ import {drawEngine} from "@/core/draw-engine";
 import {getLevel2} from "@/game-states/levels/level-2";
 import {getLevel1} from "@/game-states/levels/level-1";
 import {LevelCallback} from "@/game-states/levels/level-callback";
+import {pars} from "@/game-states/levels/pars";
+import {scores} from "@/engine/scores";
+import {levelTransitionState} from "@/game-states/level-transition-state";
 
 class MenuState implements State {
   scene: Scene;
   camera: Camera;
   selectedOptionIndex = 0;
+  options = ['New Game', 'Resume'];
   isNavigationKeyPressed = false;
-  levels: LevelCallback[] = [getLevel1, getLevel2]
 
   constructor() {
     this.scene = new Scene();
     this.camera = new Camera(Math.PI / 5, 16 / 9, 1, 400);
+
   }
 
   onEnter() {
@@ -48,20 +52,24 @@ class MenuState implements State {
         this.selectedOptionIndex -= 1;
       }
 
-      if (controls.isDown && this.selectedOptionIndex < this.levels.length - 1) {
+      if (controls.isDown && this.selectedOptionIndex < this.options.length - 1) {
         this.selectedOptionIndex += 1;
       }
     }
 
     this.isNavigationKeyPressed = controls.isDown || controls.isUp;
 
-
-    this.levels.forEach((_, index) => {
-      drawEngine.drawText(`Hole ${ index + 1}`, 75, 500, (index * 85) + 300, index === this.selectedOptionIndex ? 'blue' : 'white');
+    this.options.forEach((option, index) => {
+      drawEngine.drawText(option, 75, 500, (index * 85) + 300, index === this.selectedOptionIndex ? 'blue' : 'white');
     })
 
     if (controls.isEnter) {
-      getGameStateMachine().setState(gameState, this.levels[this.selectedOptionIndex]);
+      switch (this.selectedOptionIndex) {
+        case 0:
+          scores.resetScore(pars);
+          getGameStateMachine().setState(levelTransitionState, 1);
+          break;
+      }
     }
   }
 
