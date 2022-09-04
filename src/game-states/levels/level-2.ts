@@ -15,7 +15,7 @@ import {Level} from "@/game-states/levels/level";
 
 export function getLevel2() {
   const holePosition = new EnhancedDOMPoint();
-  const respawnPoint = new EnhancedDOMPoint(40,2,40);
+  const respawnPoint = new EnhancedDOMPoint(8,2,6);
   const cameraPosition = new EnhancedDOMPoint(0,5,-17);
 
   const scene = new Scene();

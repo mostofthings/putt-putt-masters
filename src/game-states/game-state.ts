@@ -18,6 +18,11 @@ import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 import {Mesh} from "@/engine/renderer/mesh";
 import {doTimes} from "@/engine/helpers";
 import {GolfBallMan} from "@/modeling/golf-ball-man";
+import {isPointInRadius} from "@/engine/math-helpers";
+import {drawEngine} from "@/core/draw-engine";
+import {pars} from "@/game-states/levels/pars";
+import {scores} from "@/engine/scores";
+import {levelTransitionState} from "@/game-states/level-transition-state";
 
 const debugElement = document.querySelector('#debug')!;
 
@@ -25,7 +30,6 @@ class GameState implements State {
   player: ThirdPersonPlayer;
   level!: Level;
   camera: Camera;
-  deathCount: { [key: string]: number} = {};
   deadBodies: Mesh[] = [];
 
   constructor() {
@@ -39,7 +43,7 @@ class GameState implements State {
     this.camera.position = this.level.cameraPosition;
     this.player.respawnCameraPosition.set(this.level.cameraPosition);
     this.player.respawnPoint.set(this.level.respawnPoint);
-    this.deathCount[this.level.levelNumber] = 0;
+    scores.setLevelScore(this.levelNumber, 1);
 
     this.deadBodies.forEach((man) => {
       man.position.x = 1000;
@@ -78,21 +82,32 @@ class GameState implements State {
     )
     this.player.updatePositionFromCollision(collisionDepth)
 
-    debugElement.textContent = `
-    feet x: ${ this.player.feetCenter.x }
-    feet z: ${ this.player.feetCenter.z }
-    death count: ${this.deathCount[this.level.levelNumber]}
-    total Deaths: ${this.totalDeaths}
-    dead body 0 pos: x ${ this.deadBodies[0].position.x } y ${ this.deadBodies[0].position.y } z ${this.deadBodies[0].position.z}
-    `
+    // debugElement.textContent = `
+    // feet x: ${ this.player.feetCenter.x }
+    // feet z: ${ this.player.feetCenter.z }
+    // feet y: ${ this.player.feetCenter.y }
+    // death count: ${this.deathCount[this.level.levelNumber]}
+    // total Deaths: ${this.totalDeaths}
+    // dead body 0 pos: x ${ this.deadBodies[0].position.x } y ${ this.deadBodies[0].position.y } z ${this.deadBodies[0].position.z}
+    // `
 
     if (Math.abs(this.player.feetCenter.x) > 20 || Math.abs(this.player.feetCenter.z) > 20) {
       this.killPlayer();
     }
 
+    if (isPointInRadius(this.player.feetCenter, this.level.holePosition, .8)) {
+      getGameStateMachine().setState(levelTransitionState, this.levelNumber + 1)
+    }
+
     this.level.scene.updateWorldMatrix();
 
     renderer.render(this.player.camera, this.level.scene);
+
+    drawEngine.drawText(
+      `Hole ${ this.levelNumber }
+      Par ${ pars[this.levelNumber - 1]}
+      Current Stroke: ${ scores.getLevelScore(this.levelNumber) + 1 }`
+      , 25, 600,  30, 'white');
 
     if (controls.isEscape) {
       getGameStateMachine().setState(menuState);
@@ -119,15 +134,15 @@ class GameState implements State {
   }
 
   private killPlayer() {
-    const levelNumber = this.level.levelNumber;
-    this.deathCount[levelNumber] += 1;
-    this.deadBodies[this.deathCount[levelNumber] - 1].position.set(this.player.feetCenter)
-    this.deadBodies[this.deathCount[levelNumber] - 1].position.y += .5;
+    const currentScore = scores.getLevelScore(this.levelNumber);
+    scores.setLevelScore(this.levelNumber, currentScore + 1);
+    this.deadBodies[scores.getLevelScore(this.levelNumber) - 1].position.set(this.player.feetCenter)
+    this.deadBodies[scores.getLevelScore(this.levelNumber) - 1].position.y += .5;
     this.player.respawn();
   }
 
-  get totalDeaths() {
-    return Object.values(this.deathCount).reduce((prev, current) => prev += current);
+  get levelNumber() {
+    return this.level.levelNumber;
   }
 }
 
