@@ -5,6 +5,7 @@ import {getLevel2} from "@/game-states/levels/level-2";
 import {drawEngine} from "@/core/draw-engine";
 import {getGameStateMachine} from "@/game-state-machine";
 import {gameState} from "@/game-states/game-state";
+import {scores} from "@/engine/scores";
 
 class LevelTransitionState implements State {
   levels: LevelCallback[] = [getLevel1, getLevel2]
@@ -29,6 +30,7 @@ class LevelTransitionState implements State {
     // draw menu
     this.framesElapsed += 1;
     drawEngine.drawText(`Hole ${this.currentLevelNumber}`, 50, 500, 500);
+    scores.drawScorecard();
   }
 }
 

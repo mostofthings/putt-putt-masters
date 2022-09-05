@@ -18,10 +18,12 @@ export class ThirdPersonPlayer {
   collisionRadius = .1
   respawnPoint = new EnhancedDOMPoint(0,0,0);
   respawnCameraPosition = new EnhancedDOMPoint(0,0,0);
+  speed = 0;
   velocity = new EnhancedDOMPoint(0, 0, 0);
+  speedCounter = 0;
   angle = 0;
 
-  mesh: Mesh;
+  mesh: GolfBallMan;
   camera: Camera;
   idealPosition = new EnhancedDOMPoint(0, 3, -17);
   idealLookAt = new EnhancedDOMPoint(0, 2, 0);
@@ -49,7 +51,12 @@ export class ThirdPersonPlayer {
     this.feetCenter.add(this.velocity);
 
     this.mesh.position.set(this.feetCenter);
-    this.mesh.position.y += 0.5; // move up by half height so mesh ends at feet position
+    this.mesh.position.y += 1; // move up by half height so mesh ends at feet position
+    debugElement.textContent = `mag: ${Math.sin(this.speedCounter)}`
+    this.speedCounter += .5;
+    if (!this.isJumping) {
+      this.rotateLegs();
+    }
 
     this.camera.position.lerp(this.transformIdeal(this.idealPosition), 0.01);
 
@@ -125,5 +132,13 @@ export class ThirdPersonPlayer {
     this.mesh.position.set(this.respawnPoint);
     this.feetCenter.set(this.respawnPoint);
     this.camera.position.set(this.respawnCameraPosition);
+  }
+
+  protected rotateLegs() {
+    // TODO: multiply by speed / max speed for amount
+    const rotateAmount = Math.sin(this.speedCounter) * .5;
+    this.mesh.legs[0].setRotation(rotateAmount, 0, 0);
+    this.mesh.legs[1].setRotation(rotateAmount * -1,0, 0)
+
   }
 }
