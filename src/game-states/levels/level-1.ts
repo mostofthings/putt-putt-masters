@@ -14,12 +14,13 @@ import {InstancedMesh} from "@/engine/renderer/instanced-mesh";
 import {largeTree, leavesMesh, plant1} from "@/modeling/flora";
 import {Level} from "@/game-states/levels/level";
 import {getHole} from "@/modeling/hole";
+import {makeSpikedGround} from "@/modeling/spiked-ground";
 
 
 export function getLevel1() {
   const holePosition = new EnhancedDOMPoint(-2,1.25,15);
   const respawnPoint = new EnhancedDOMPoint(0,1.5,0);
-  const cameraPosition = new EnhancedDOMPoint(0,5,-17);
+  const cameraPosition = new EnhancedDOMPoint(2,2,-2);
 
   const scene = new Scene();
 
@@ -167,7 +168,10 @@ export function getLevel1() {
   const hole = getHole();
   hole.position.set(holePosition);
 
-  const levelParts = [ramp, wall, floor, lake, tree, bridge, test, instancedTest, instancedTest2, treeLeaves, hole];
+  const spikes = makeSpikedGround(10,2);
+  spikes.position.set(-2,1.25,15)
+
+  const levelParts = [ramp, wall, floor, lake, tree, bridge, test, instancedTest, instancedTest2, treeLeaves, hole, spikes];
 
   const groupedFaces = getGroupedFaces([ramp, wall, floor, lake]);
   levelParts.push(particle);

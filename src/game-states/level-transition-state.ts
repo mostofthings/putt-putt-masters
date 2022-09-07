@@ -23,7 +23,8 @@ class LevelTransitionState implements State {
 
   onUpdate(timeElapsed: number): void {
     drawEngine.context.clearRect(0,0,1000,1000)
-    if (this.framesElapsed > 100) {
+    // TODO: increase time
+    if (this.framesElapsed > 10) {
       getGameStateMachine().setState(gameState, this.levels[this.currentLevelNumber - 1])
       return;
     }

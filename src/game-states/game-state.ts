@@ -35,7 +35,7 @@ class GameState implements State {
   constructor() {
     this.camera = new Camera(Math.PI / 3, 16 / 9, 1, 400);
     this.player = new ThirdPersonPlayer(this.camera);
-    doTimes(150, () => this.deadBodies.push(new GolfBallMan()));
+    doTimes(80, () => this.deadBodies.push(new GolfBallMan()));
   }
 
   onEnter(levelCallback: LevelCallback) {
