@@ -127,6 +127,10 @@ class GameState implements State {
       return;
     }
 
+    if (floorData.floor.isDeadly) {
+      this.killPlayer();
+    }
+
     return floorData.height - feetCenter.y;
   }
 

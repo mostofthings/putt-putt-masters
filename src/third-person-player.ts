@@ -137,7 +137,8 @@ export class ThirdPersonPlayer {
 
   respawn() {
     this.mesh.position.set(this.respawnPoint);
-    this.feetCenter.set(this.respawnPoint);
+    this.mesh.position.y += 4;
+    this.feetCenter.set(this.mesh.position);
     this.camera.position.set(this.respawnCameraPosition);
   }
 

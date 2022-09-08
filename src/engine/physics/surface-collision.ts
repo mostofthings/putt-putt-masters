@@ -4,7 +4,8 @@ import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 // TODO: Make this return multiple floors and sort by height. Currently
 // this requires floor faces to be sent in from highest to lowest, which with angles
 // won't always be possible in a good way
-export function findFloorHeightAtPosition(floorFaces: Face[], position: EnhancedDOMPoint) {
+export function findFloorHeightAtPosition(floorFaces: Face[], position: EnhancedDOMPoint)
+  : { height: number, floor: Face } | undefined {
   let height: number;
 
   for (const floor of floorFaces) {

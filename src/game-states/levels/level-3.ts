@@ -11,18 +11,13 @@ import {getGroupedFaces} from "@/engine/physics/parse-faces";
 import {doTimes} from "@/engine/helpers";
 import {findFloorHeightAtPosition} from "@/engine/physics/surface-collision";
 import {InstancedMesh} from "@/engine/renderer/instanced-mesh";
-import {largeTree, leavesMesh, plant1} from "@/modeling/flora";
 import {Level} from "@/game-states/levels/level";
-import {createHole} from "@/modeling/hole";
-import {createSpikedGround} from "@/modeling/spiked-ground";
-import {createProximityMine} from "@/modeling/proximity-mine";
-import {createStartPlatform} from "@/modeling/tee-platform";
+import {getRandomArbitrary} from "@/engine/math-helpers";
 
-
-export function getLevel2() {
-  const holePosition = new EnhancedDOMPoint(-2,1.25,15);
-  const respawnPoint = new EnhancedDOMPoint(4,-2.3,-6);
-  const cameraPosition = new EnhancedDOMPoint(6,2,-8);
+export function getLevel3() {
+  const holePosition = new EnhancedDOMPoint();
+  const respawnPoint = new EnhancedDOMPoint(8,2,6);
+  const cameraPosition = new EnhancedDOMPoint(0,5,-17);
 
   const scene = new Scene();
 
@@ -36,8 +31,6 @@ export function getLevel2() {
     new PlaneGeometry(255, 255, 127, 127, sampleHeightMap),
     materials.grass
   );
-
-  const platform = createStartPlatform(respawnPoint);
 
   const lake = new Mesh(
     new PlaneGeometry(200, 200, 1, 1),
@@ -56,38 +49,7 @@ export function getLevel2() {
 
   const ramp = new Mesh(rampGeometry, materials.marble);
 
-  function getRandomArbitrary(min: number, max: number) {
-    return Math.random() * (max - min) + min;
-  }
 
-
-
-  function makeTree() {
-    const trunkGeo = new MoldableCubeGeometry(1, 4, 1, 3, 3, 3)
-      .cylindrify(0.5)
-      .computeNormalsCrossPlane()
-      .done();
-
-    const trunk = new Mesh(trunkGeo, materials.wood);
-
-    const foliageGeometry = new MoldableCubeGeometry(4, 4, 4, 4, 4, 4);
-    foliageGeometry
-      .spherify(4)
-      .scale(1, 1.5, 1)
-      .noisify(2, 0.02)
-      .computeNormalsCrossPlane()
-      .done()
-
-    const leaves = new Mesh(foliageGeometry, materials.treeLeaves);
-    leaves.position.y += 6;
-    return new Object3d(trunk, leaves);
-  }
-
-  const tree = makeTree();
-  tree.position.x += 10;
-  tree.position.z += 40;
-  tree.position.y += 10;
-  tree.updateWorldMatrix();
   //
 
   function makeBridge() {
@@ -143,7 +105,6 @@ export function getLevel2() {
     // instanced drawing.
     transforms.push(transformMatrix);
   });
-  const instancedTest = new InstancedMesh(plant1.geometry, transforms, count, plant1.material);
 
   const count2 = 43;
   const transforms2: DOMMatrix[] = [];
@@ -158,8 +119,6 @@ export function getLevel2() {
     // instanced drawing.
     transforms2.push(transformMatrix);
   });
-  const instancedTest2 = new InstancedMesh(largeTree.geometry, transforms2, count2, largeTree.material);
-  const treeLeaves = new InstancedMesh(leavesMesh.geometry, transforms2, count2, leavesMesh.material);
 
 
 // TESTING
@@ -169,27 +128,17 @@ export function getLevel2() {
   const testCube = new MoldableCubeGeometry(3, 3, 3, 1, 1, 1);
   const test = new Mesh(testCube, materials.bricks,);
 
-  const hole = createHole(holePosition);
-  hole.position.set(holePosition);
+  const levelParts = [ramp, wall, floor, lake, bridge, test];
 
-  const mine = createProximityMine();
-  mine.position.set(4, 1, -4);
-
-  const spikes = createSpikedGround(10,2);
-  spikes.position.set(-5,1.25,10)
-
-  const levelParts = [platform, ramp, wall, floor, lake, tree, bridge, test, instancedTest, instancedTest2, treeLeaves, hole, spikes, mine];
-
-  const collidableObjects = [spikes, platform, ramp, wall, hole, floor, lake];
-  collidableObjects.forEach(object => object.updateWorldMatrix())
-  const groupedFaces = getGroupedFaces(collidableObjects);
+  const groupedFaces = getGroupedFaces([ramp, wall, floor, lake]);
   levelParts.push(particle);
   levelParts.push(particle2);
+
+
+
 
   // scene.add(this.player.mesh);
   scene.add(...levelParts);
 
-  return new Level(2
-    , holePosition, respawnPoint, cameraPosition, scene, groupedFaces)
+  return new Level(3, holePosition, respawnPoint, cameraPosition, scene, groupedFaces)
 }
-

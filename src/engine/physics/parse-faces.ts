@@ -31,7 +31,7 @@ export function getGroupedFaces(meshes: Mesh[]) {
       ]);
     }
 
-    return triangles.map(triangle => new Face(triangle));
+    return triangles.map(triangle => new Face(triangle, undefined, mesh.isDeadly));
   });
 
   const floorFaces: Face[] = [];

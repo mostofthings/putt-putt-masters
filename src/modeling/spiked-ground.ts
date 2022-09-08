@@ -7,32 +7,35 @@ import {createSpike} from "@/modeling/spike";
 
 const spikeBaseSize = .5;
 
-export function makeSpikedGround(width: number, length: number): Object3d {
+export function createSpikedGround(width: number, length: number) {
   const numberOfSpikesX = getNumberOfSpikesPerDimension(width);
   const numberOfSpikesY = getNumberOfSpikesPerDimension(length);
   const spikeWidth = width / numberOfSpikesX;
   const spikeLength = length / numberOfSpikesY;
   const spikeBase = new Mesh(
     new MoldableCubeGeometry(width, .25, length),
-    new Material({color: 'black'})
+    new Material({color: 'black'}),
+    true,
   );
 
-  spikeBase.position.set(width / 2, 0, length / 2)
   const spikes: Mesh[] = [];
+  const startWidth = width / 2 * -1;
+  const startLength = length / 2 * -1;
 
   doTimes(numberOfSpikesX, (widthIndex) => {
     doTimes(numberOfSpikesY, (lengthIndex) => {
       // spike geometry should be merged into one Mesh
       const newSpike = new Mesh(createSpike(spikeWidth / 2, spikeBaseSize), new Material({color: '#666'}));
       newSpike.position.set(
-        (spikeWidth / 2) + widthIndex * spikeWidth,
+        (spikeWidth / 2) + widthIndex * spikeWidth + startWidth,
         spikeBaseSize / 2,
-        (spikeLength / 2) + lengthIndex * spikeLength,
+        (spikeLength / 2) + lengthIndex * spikeLength + startLength,
         )
       spikes.push(newSpike)
     })
   })
-  return new Object3d(spikeBase, ...spikes);
+  spikeBase.add(...spikes);
+  return spikeBase;
 }
 
 

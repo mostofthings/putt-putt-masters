@@ -6,11 +6,13 @@ import { InstancedMesh } from '@/engine/renderer/instanced-mesh';
 export class Mesh extends Object3d {
   geometry: BufferGeometry;
   material: Material;
+  isDeadly: boolean;
 
-  constructor(geometry: BufferGeometry, material: Material) {
+  constructor(geometry: BufferGeometry, material: Material, isDeadly = false) {
     super();
     this.geometry = geometry;
     this.material = material;
+    this.isDeadly = isDeadly;
   }
 
   clone() {
