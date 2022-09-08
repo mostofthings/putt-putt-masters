@@ -170,7 +170,7 @@ export function getLevel1() {
   hole.position.set(holePosition);
 
   const mine = createProximityMine();
-  mine.position.set(-2, 1, 6);
+  mine.position.set(4, 1, -4);
 
   const spikes = makeSpikedGround(10,2);
   spikes.position.set(-2,1.25,15)
