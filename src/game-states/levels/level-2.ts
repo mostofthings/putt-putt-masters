@@ -12,6 +12,7 @@ import {doTimes} from "@/engine/helpers";
 import {findFloorHeightAtPosition} from "@/engine/physics/surface-collision";
 import {InstancedMesh} from "@/engine/renderer/instanced-mesh";
 import {Level} from "@/game-states/levels/level";
+import {getRandomArbitrary} from "@/engine/math-helpers";
 
 export function getLevel2() {
   const holePosition = new EnhancedDOMPoint();
@@ -48,9 +49,7 @@ export function getLevel2() {
 
   const ramp = new Mesh(rampGeometry, materials.marble);
 
-  function getRandomArbitrary(min: number, max: number) {
-    return Math.random() * (max - min) + min;
-  }
+
   //
 
   function makeBridge() {

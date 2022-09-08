@@ -3,6 +3,7 @@ import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 import {Material} from "@/engine/renderer/material";
 import {doTimes} from "@/engine/helpers";
 import {Object3d} from "@/engine/renderer/object-3d";
+import {getRandomArbitrary} from "@/engine/math-helpers";
 
 
 export class GolfBallMan extends Mesh {
@@ -19,6 +20,18 @@ export class GolfBallMan extends Mesh {
     this.arms = createArms();
     this.add(...this.arms);
   }
+}
+
+export function createDeadBody(): Mesh {
+  const body = new Mesh(createGolfBallBody(), new Material({ color: '#fff'}));
+  const arm = createArm(.4, .2);
+  const arm2 = createArm(-.2, .2);
+  const face = createFace();
+  body.add(arm, arm2);
+  body.add(face);
+  body.setRotation(getRandomArbitrary(0,1), 2, getRandomArbitrary(0.5,1));
+  body.position.set(0,1,0);
+  return body;
 }
 
 function createGolfBallBody() {

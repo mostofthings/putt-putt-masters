@@ -15,6 +15,7 @@ import {largeTree, leavesMesh, plant1} from "@/modeling/flora";
 import {Level} from "@/game-states/levels/level";
 import {getHole} from "@/modeling/hole";
 import {makeSpikedGround} from "@/modeling/spiked-ground";
+import {createProximityMine} from "@/modeling/proximity-mine";
 
 
 export function getLevel1() {
@@ -168,10 +169,13 @@ export function getLevel1() {
   const hole = getHole();
   hole.position.set(holePosition);
 
+  const mine = createProximityMine();
+  mine.position.set(-2, 1, 6);
+
   const spikes = makeSpikedGround(10,2);
   spikes.position.set(-2,1.25,15)
 
-  const levelParts = [ramp, wall, floor, lake, tree, bridge, test, instancedTest, instancedTest2, treeLeaves, hole, spikes];
+  const levelParts = [ramp, wall, floor, lake, tree, bridge, test, instancedTest, instancedTest2, treeLeaves, hole, spikes, mine];
 
   const groupedFaces = getGroupedFaces([ramp, wall, floor, lake]);
   levelParts.push(particle);
