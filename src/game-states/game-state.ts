@@ -161,6 +161,7 @@ class GameState implements State {
   }
 
   private killPlayer() {
+    // you can only die once 🤵
     if (this.player.isDead) {
       return;
     }
