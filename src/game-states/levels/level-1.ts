@@ -14,9 +14,9 @@ export function getLevel1() {
   const ground = createRegularGrass(20, 40);
   ground.position.set(0,-2, 0);
 
-  const obstacles = [createRegularGrass(9.5, 3, 4), createRegularGrass(9.5, 3, 4)]
-  obstacles[0].position.set(-5.5, 0, -4);
-  obstacles[1].position.set(5.5, 0, -4);
+  const obstacles = [createSpikedGround(9, 3), createSpikedGround(9, 3)]
+  obstacles[0].position.set(-5, -.5, -4);
+  obstacles[1].position.set(5, -.5, -4);
 
 
   const platform = createStartPlatform(respawnPoint);
@@ -24,7 +24,7 @@ export function getLevel1() {
   const spikes = createSpikedGround(20, 3);
   spikes.position.set(0, -.5, 4);
 
-  const mine = new ProximityMine(new EnhancedDOMPoint(0, 0, -4));
+  const mine = new ProximityMine(new EnhancedDOMPoint(0, 0, -2.5));
 
   const enemies = [mine, mine.explosion] as Enemy[];
 
