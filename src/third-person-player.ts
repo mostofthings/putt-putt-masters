@@ -7,17 +7,20 @@ import { textureLoader } from '@/engine/renderer/texture-loader';
 import { drawVolcanicRock } from '@/texture-maker';
 import { audioCtx } from '@/engine/audio/audio-player';
 import {GolfBallMan} from "@/modeling/golf-ball-man";
+import {clamp, moveValueTowardsTarget} from "@/engine/helpers";
 
 const debugElement = document.querySelector('#debug')!;
 
 
 export class ThirdPersonPlayer {
   isJumping = false;
+  canJumpAgain = true;
   feetCenter = new EnhancedDOMPoint(0, 0, 0);
   collisionOffsetY = .4;
   collisionRadius = .1
   respawnPoint = new EnhancedDOMPoint(0,0,0);
   respawnCameraPosition = new EnhancedDOMPoint(0,0,0);
+
   speed = 0;
   velocity = new EnhancedDOMPoint(0, 0, 0);
   speedCounter = 0;
@@ -25,7 +28,7 @@ export class ThirdPersonPlayer {
 
   mesh: GolfBallMan;
   camera: Camera;
-  idealPosition = new EnhancedDOMPoint(0, 3, -17);
+  idealPosition = new EnhancedDOMPoint(0, 3, -8);
   idealLookAt = new EnhancedDOMPoint(0, 2, 0);
 
   listener: AudioListener;
@@ -51,12 +54,11 @@ export class ThirdPersonPlayer {
     this.feetCenter.add(this.velocity);
 
     this.mesh.position.set(this.feetCenter);
-    this.mesh.position.y += 1; // move up by half height so mesh ends at feet position
-    debugElement.textContent = `mag: ${Math.sin(this.speedCounter)}`
-    this.speedCounter += .5;
-    if (!this.isJumping) {
-      this.rotateLegs();
-    }
+    this.mesh.position.y += 1.25; // move up by half height so mesh ends at feet position
+
+
+    this.moveAppendages();
+
 
     this.camera.position.lerp(this.transformIdeal(this.idealPosition), 0.01);
 
@@ -78,9 +80,12 @@ export class ThirdPersonPlayer {
   }
 
   protected updateVelocityFromControls() {
-    const speed = 0.1;
+    const speedMultiplier = 0.1;
 
-    const mag = controls.direction.magnitude;
+    const mag = clamp(controls.direction.magnitude, 0, 1);
+    const step = mag > this.speed ? .05 : .03;
+    this.speed = moveValueTowardsTarget(this.speed, mag, step);
+
     const inputAngle = Math.atan2(-controls.direction.x, -controls.direction.z);
     const playerCameraDiff = this.mesh.position.clone().subtract(this.camera.position);
     const playerCameraAngle = Math.atan2(playerCameraDiff.x, playerCameraDiff.z);
@@ -89,18 +94,22 @@ export class ThirdPersonPlayer {
       this.angle = inputAngle + playerCameraAngle;
     }
 
-    this.velocity.z = Math.cos(this.angle) * mag * speed;
-    this.velocity.x = Math.sin(this.angle) * mag * speed;
+    this.velocity.z = Math.cos(this.angle) * this.speed * speedMultiplier;
+    this.velocity.x = Math.sin(this.angle) * this.speed * speedMultiplier;
 
     this.mesh.setRotation(0, this.angle, 0);
 
-    if (controls.isSpace || controls.isJumpPressed) {
+    if (controls.isJumpPressed && this.canJumpAgain) {
       if (!this.isJumping) {
-        this.velocity.y = 0.15;
+        this.velocity.y = 0.4;
         this.isJumping = true;
+        this.canJumpAgain = false;
       }
     }
-    this.velocity.y -= 0.003; // gravity
+    if (!this.isJumping && !controls.isJumpPressed) {
+      this.canJumpAgain = true;
+    }
+    this.velocity.y -= 0.025; // gravity
   }
 
   updatePositionFromCollision(collisionDepth?: number) {
@@ -116,9 +125,6 @@ export class ThirdPersonPlayer {
     this.listener.positionY.value = this.mesh.position.y;
     this.listener.positionZ.value = this.mesh.position.z;
 
-    // const cameraDireciton = new EnhancedDOMPoint();
-    // cameraDireciton.setFromRotationMatrix(this.camera.rotationMatrix);
-
     const {x, z} = this.mesh.position.clone()
       .subtract(this.camera.position) // distance from camera to player
       .normalize() // direction of camera to player
@@ -130,15 +136,26 @@ export class ThirdPersonPlayer {
 
   respawn() {
     this.mesh.position.set(this.respawnPoint);
-    this.feetCenter.set(this.respawnPoint);
+    this.mesh.position.y += 8;
+    this.feetCenter.set(this.mesh.position);
     this.camera.position.set(this.respawnCameraPosition);
   }
 
-  protected rotateLegs() {
-    // TODO: multiply by speed / max speed for amount
-    const rotateAmount = Math.sin(this.speedCounter) * .5;
-    this.mesh.legs[0].setRotation(rotateAmount, 0, 0);
-    this.mesh.legs[1].setRotation(rotateAmount * -1,0, 0)
+  protected moveAppendages() {
+    const rotateAmount = Math.sin(this.speedCounter) * .5 * this.speed;
+    // no walking while jumping
+    if (!this.isJumping) {
+      this.speedCounter += this.speed * .5;
+      this.mesh.legs[0].setRotation(rotateAmount, 0, 0);
+      this.mesh.legs[1].setRotation(rotateAmount * -1,0, 0);
+      this.mesh.legs[0].children[0].children[0].setRotation(rotateAmount * .5, 0,0)
+      this.mesh.legs[1].children[0].children[0].setRotation(rotateAmount * -.5, 0 ,0)
+    }
+    this.mesh.arms[0].setRotation(rotateAmount * -1,0, 0);
+    this.mesh.arms[1].setRotation(rotateAmount, 0, 0);
 
+    // arms flap while jumping
+    this.mesh.arms[0].children[0].setRotation(0,0, this.velocity.y * 4);
+    this.mesh.arms[1].children[0].setRotation(0,0, this.velocity.y * -4);
   }
 }

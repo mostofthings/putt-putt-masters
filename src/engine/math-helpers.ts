@@ -3,6 +3,11 @@ import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 export function radsToDegrees(radians: number): number {
   return radians * (180 / Math.PI)
 }
+// (x * pi) / 180 = y
+
+export function degreesToRads(degrees: number): number {
+  return degrees * Math.PI / 180;
+}
 
 function unormalizedNormal(points: EnhancedDOMPoint[]): EnhancedDOMPoint {
   const u = points[2].clone().subtract(points[1]);
@@ -29,4 +34,8 @@ export function calculateVertexNormals(points: EnhancedDOMPoint[], indices: numb
 export function isPointInRadius(pointToEval: EnhancedDOMPoint, centerPoint: EnhancedDOMPoint, radius: number): boolean {
   const distance = new EnhancedDOMPoint().subtractVectors(pointToEval, centerPoint).magnitude;
   return distance < radius
+}
+
+export function getRandomArbitrary(min: number, max: number) {
+  return Math.random() * (max - min) + min;
 }

@@ -17,8 +17,8 @@ import {GroupedFaces} from "@/engine/grouped-faces";
 import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 import {Mesh} from "@/engine/renderer/mesh";
 import {doTimes} from "@/engine/helpers";
-import {GolfBallMan} from "@/modeling/golf-ball-man";
-import {isPointInRadius} from "@/engine/math-helpers";
+import {createDeadBody, GolfBallMan} from "@/modeling/golf-ball-man";
+import {degreesToRads, isPointInRadius, radsToDegrees} from "@/engine/math-helpers";
 import {drawEngine} from "@/core/draw-engine";
 import {pars} from "@/game-states/levels/pars";
 import {scores} from "@/engine/scores";
@@ -30,12 +30,10 @@ class GameState implements State {
   player: ThirdPersonPlayer;
   level!: Level;
   camera: Camera;
-  deadBodies: Mesh[] = [];
 
   constructor() {
     this.camera = new Camera(Math.PI / 3, 16 / 9, 1, 400);
     this.player = new ThirdPersonPlayer(this.camera);
-    doTimes(150, () => this.deadBodies.push(new GolfBallMan()));
   }
 
   onEnter(levelCallback: LevelCallback) {
@@ -44,11 +42,6 @@ class GameState implements State {
     this.player.respawnCameraPosition.set(this.level.cameraPosition);
     this.player.respawnPoint.set(this.level.respawnPoint);
     scores.setLevelScore(this.levelNumber, 1);
-
-    this.deadBodies.forEach((man) => {
-      man.position.x = 1000;
-      this.level.scene.add(man);
-    })
 
     this.player.respawn();
 
@@ -82,13 +75,10 @@ class GameState implements State {
     )
     this.player.updatePositionFromCollision(collisionDepth)
 
+
     // debugElement.textContent = `
-    // feet x: ${ this.player.feetCenter.x }
-    // feet z: ${ this.player.feetCenter.z }
-    // feet y: ${ this.player.feetCenter.y }
-    // death count: ${this.deathCount[this.level.levelNumber]}
-    // total Deaths: ${this.totalDeaths}
-    // dead body 0 pos: x ${ this.deadBodies[0].position.x } y ${ this.deadBodies[0].position.y } z ${this.deadBodies[0].position.z}
+    //   rad: ${rad},
+    //   deg: ${degrees}
     // `
 
     if (Math.abs(this.player.feetCenter.x) > 20 || Math.abs(this.player.feetCenter.z) > 20) {
@@ -130,14 +120,20 @@ class GameState implements State {
       return;
     }
 
-    return floorData.height - feetCenter.y;
+    const collisionDepth = floorData.height - feetCenter.y;
+
+    if (floorData.floor.isDeadly && collisionDepth > 0) {
+      this.killPlayer();
+    }
+
+    return collisionDepth;
   }
 
   private killPlayer() {
     const currentScore = scores.getLevelScore(this.levelNumber);
     scores.setLevelScore(this.levelNumber, currentScore + 1);
-    this.deadBodies[scores.getLevelScore(this.levelNumber) - 1].position.set(this.player.feetCenter)
-    this.deadBodies[scores.getLevelScore(this.levelNumber) - 1].position.y += .5;
+    this.level.deadBodies[currentScore - 1].position.set(this.player.feetCenter)
+    this.level.deadBodies[currentScore - 1].position.y += .75;
     this.player.respawn();
   }
 

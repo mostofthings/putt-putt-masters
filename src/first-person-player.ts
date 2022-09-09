@@ -110,7 +110,7 @@ export class FirstPersonPlayer {
 
     this.mesh.setRotation(0, this.cameraRotation.y, 0);
 
-    if (controls.isSpace || controls.isJumpPressed) {
+    if (controls.isJumpPressed) {
       if (!this.isJumping) {
         this.velocity.y = 0.15;
         this.isJumping = true;
