@@ -24,8 +24,6 @@ export function getLevel2() {
   const respawnPoint = new EnhancedDOMPoint(4,-2.3,-6);
   const cameraPosition = new EnhancedDOMPoint(6,2,-8);
 
-  const scene = new Scene();
-
   const sampleHeightMap: number[] = [];
   const imageData = drawLandscape().data;
   for (let i = 0; i < imageData.length; i+= 4) {
@@ -169,8 +167,6 @@ export function getLevel2() {
   const testCube = new MoldableCubeGeometry(3, 3, 3, 1, 1, 1);
   const test = new Mesh(testCube, materials.bricks,);
 
-  const hole = createHole(holePosition);
-  hole.position.set(holePosition);
 
   const mine = createProximityMine();
   mine.position.set(4, 1, -4);
@@ -178,18 +174,15 @@ export function getLevel2() {
   const spikes = createSpikedGround(10,2);
   spikes.position.set(-5,1.25,10)
 
-  const levelParts = [platform, ramp, wall, floor, lake, tree, bridge, test, instancedTest, instancedTest2, treeLeaves, hole, spikes, mine];
+  const meshesToRender = [platform, ramp, wall, floor, lake, tree, bridge, test, instancedTest, instancedTest2, treeLeaves, spikes, mine] as Mesh[];
 
-  const collidableObjects = [spikes, platform, ramp, wall, hole, floor, lake];
-  collidableObjects.forEach(object => object.updateWorldMatrix())
-  const groupedFaces = getGroupedFaces(collidableObjects);
-  levelParts.push(particle);
-  levelParts.push(particle2);
+  const meshesToCollide = [spikes, platform, ramp, wall, floor, lake];
+  meshesToCollide.forEach(object => object.updateWorldMatrix())
 
-  // scene.add(this.player.mesh);
-  scene.add(...levelParts);
+  meshesToRender.push(particle);
+  meshesToRender.push(particle2);
 
   return new Level(2
-    , holePosition, respawnPoint, cameraPosition, scene, groupedFaces)
+    , holePosition, respawnPoint, cameraPosition, meshesToCollide, meshesToRender)
 }
 

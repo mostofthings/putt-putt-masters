@@ -32,7 +32,7 @@ export function getGroupedFaces(meshes: Mesh[]) {
     }
 
     return triangles.map(triangle => new Face(triangle, undefined, mesh.isDeadly));
-  });
+  }).sort((a, b) => a.upperY > b.upperY ? -1 : 1);
 
   const floorFaces: Face[] = [];
   const wallFaces: Face[] = [];

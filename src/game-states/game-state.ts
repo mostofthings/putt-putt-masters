@@ -30,12 +30,10 @@ class GameState implements State {
   player: ThirdPersonPlayer;
   level!: Level;
   camera: Camera;
-  deadBodies: Mesh[] = [];
 
   constructor() {
     this.camera = new Camera(Math.PI / 3, 16 / 9, 1, 400);
     this.player = new ThirdPersonPlayer(this.camera);
-    doTimes(80, () => this.deadBodies.push(createDeadBody()));
   }
 
   onEnter(levelCallback: LevelCallback) {
@@ -44,11 +42,6 @@ class GameState implements State {
     this.player.respawnCameraPosition.set(this.level.cameraPosition);
     this.player.respawnPoint.set(this.level.respawnPoint);
     scores.setLevelScore(this.levelNumber, 1);
-
-    this.deadBodies.forEach((man) => {
-      man.position.x = 1000;
-      this.level.scene.add(man);
-    })
 
     this.player.respawn();
 
@@ -127,18 +120,20 @@ class GameState implements State {
       return;
     }
 
-    if (floorData.floor.isDeadly) {
+    const collisionDepth = floorData.height - feetCenter.y;
+
+    if (floorData.floor.isDeadly && collisionDepth > 0) {
       this.killPlayer();
     }
 
-    return floorData.height - feetCenter.y;
+    return collisionDepth;
   }
 
   private killPlayer() {
     const currentScore = scores.getLevelScore(this.levelNumber);
     scores.setLevelScore(this.levelNumber, currentScore + 1);
-    this.deadBodies[scores.getLevelScore(this.levelNumber) - 1].position.set(this.player.feetCenter)
-    this.deadBodies[scores.getLevelScore(this.levelNumber) - 1].position.y += .5;
+    this.level.deadBodies[currentScore - 1].position.set(this.player.feetCenter)
+    this.level.deadBodies[currentScore - 1].position.y += .75;
     this.player.respawn();
   }
 

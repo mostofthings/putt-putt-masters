@@ -19,8 +19,6 @@ export function getLevel3() {
   const respawnPoint = new EnhancedDOMPoint(8,2,6);
   const cameraPosition = new EnhancedDOMPoint(0,5,-17);
 
-  const scene = new Scene();
-
   const sampleHeightMap: number[] = [];
   const imageData = drawLandscape().data;
   for (let i = 0; i < imageData.length; i+= 4) {
@@ -128,17 +126,12 @@ export function getLevel3() {
   const testCube = new MoldableCubeGeometry(3, 3, 3, 1, 1, 1);
   const test = new Mesh(testCube, materials.bricks,);
 
-  const levelParts = [ramp, wall, floor, lake, bridge, test];
+  const meshesToRender = [ramp, wall, floor, lake, bridge, test];
 
-  const groupedFaces = getGroupedFaces([ramp, wall, floor, lake]);
-  levelParts.push(particle);
-  levelParts.push(particle2);
-
-
+  const meshesToCollide = [ramp, wall, floor, lake];
+  meshesToRender.push(particle);
+  meshesToRender.push(particle2);
 
 
-  // scene.add(this.player.mesh);
-  scene.add(...levelParts);
-
-  return new Level(3, holePosition, respawnPoint, cameraPosition, scene, groupedFaces)
+  return new Level(3, holePosition, respawnPoint, cameraPosition, meshesToCollide, meshesToRender)
 }

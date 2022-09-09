@@ -6,7 +6,6 @@ class Controls {
   isLeft = false;
   isRight = false;
   isEnter = false;
-  isSpace = false;
   isEscape = false;
   direction: EnhancedDOMPoint;
   isJumpPressed = false;
@@ -70,7 +69,7 @@ class Controls {
         this.isEnter = isPressed;
         break;
       case 'Space':
-        this.isSpace = isPressed;
+        this.isJumpPressed = isPressed;
         break;
       case 'Escape':
         this.isEscape = isPressed;

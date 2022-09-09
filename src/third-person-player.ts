@@ -14,6 +14,7 @@ const debugElement = document.querySelector('#debug')!;
 
 export class ThirdPersonPlayer {
   isJumping = false;
+  canJumpAgain = true;
   feetCenter = new EnhancedDOMPoint(0, 0, 0);
   collisionOffsetY = .4;
   collisionRadius = .1
@@ -84,9 +85,6 @@ export class ThirdPersonPlayer {
     const mag = clamp(controls.direction.magnitude, 0, 1);
     const step = mag > this.speed ? .05 : .03;
     this.speed = moveValueTowardsTarget(this.speed, mag, step);
-    if (!this.isJumping) {
-
-    }
 
     const inputAngle = Math.atan2(-controls.direction.x, -controls.direction.z);
     const playerCameraDiff = this.mesh.position.clone().subtract(this.camera.position);
@@ -101,11 +99,15 @@ export class ThirdPersonPlayer {
 
     this.mesh.setRotation(0, this.angle, 0);
 
-    if (controls.isSpace || controls.isJumpPressed) {
+    if (controls.isJumpPressed && this.canJumpAgain) {
       if (!this.isJumping) {
         this.velocity.y = 0.4;
         this.isJumping = true;
+        this.canJumpAgain = false;
       }
+    }
+    if (!this.isJumping && !controls.isJumpPressed) {
+      this.canJumpAgain = true;
     }
     this.velocity.y -= 0.025; // gravity
   }
@@ -123,9 +125,6 @@ export class ThirdPersonPlayer {
     this.listener.positionY.value = this.mesh.position.y;
     this.listener.positionZ.value = this.mesh.position.z;
 
-    // const cameraDireciton = new EnhancedDOMPoint();
-    // cameraDireciton.setFromRotationMatrix(this.camera.rotationMatrix);
-
     const {x, z} = this.mesh.position.clone()
       .subtract(this.camera.position) // distance from camera to player
       .normalize() // direction of camera to player
@@ -137,7 +136,7 @@ export class ThirdPersonPlayer {
 
   respawn() {
     this.mesh.position.set(this.respawnPoint);
-    this.mesh.position.y += 4;
+    this.mesh.position.y += 8;
     this.feetCenter.set(this.mesh.position);
     this.camera.position.set(this.respawnCameraPosition);
   }
