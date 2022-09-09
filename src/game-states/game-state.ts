@@ -95,7 +95,7 @@ class GameState implements State {
     drawEngine.drawText(
       `Hole ${ this.levelNumber }
       Par ${ pars[this.levelNumber - 1]}
-      Current Stroke: ${ scores.getLevelScore(this.levelNumber) + 1 }`
+      Current Stroke: ${ scores.getLevelScore(this.levelNumber) }`
       , 25, 600,  30, 'white');
 
     if (controls.isEscape) {
