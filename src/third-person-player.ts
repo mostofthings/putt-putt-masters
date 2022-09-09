@@ -14,10 +14,12 @@ const debugElement = document.querySelector('#debug')!;
 
 export class ThirdPersonPlayer {
   isJumping = false;
+  isDead = false;
   canJumpAgain = true;
   feetCenter = new EnhancedDOMPoint(0, 0, 0);
   collisionOffsetY = .4;
-  collisionRadius = .1
+  collisionRadius = .5;
+  height = 1;
   respawnPoint = new EnhancedDOMPoint(0,0,0);
   respawnCameraPosition = new EnhancedDOMPoint(0,0,0);
 
@@ -48,16 +50,18 @@ export class ThirdPersonPlayer {
       .add(this.mesh.position);
   }
 
-  update(groupedFaces: { floorFaces: Face[]; wallFaces: Face[] }) {
-    this.updateVelocityFromControls();
+  update() {
+    if (!this.isDead) {
+      this.updateVelocityFromControls();
+      this.moveAppendages();
+    } if (this.isDead) {
+      this.velocity.x = 0;
+      this.velocity.z = 0;
+    }
 
     this.feetCenter.add(this.velocity);
-
     this.mesh.position.set(this.feetCenter);
     this.mesh.position.y += 1.25; // move up by half height so mesh ends at feet position
-
-
-    this.moveAppendages();
 
 
     this.camera.position.lerp(this.transformIdeal(this.idealPosition), 0.01);
@@ -109,6 +113,7 @@ export class ThirdPersonPlayer {
     if (!this.isJumping && !controls.isJumpPressed) {
       this.canJumpAgain = true;
     }
+
     this.velocity.y -= 0.025; // gravity
   }
 
@@ -135,6 +140,7 @@ export class ThirdPersonPlayer {
   }
 
   respawn() {
+    this.isDead = false;
     this.mesh.position.set(this.respawnPoint);
     this.mesh.position.y += 8;
     this.feetCenter.set(this.mesh.position);
@@ -158,4 +164,8 @@ export class ThirdPersonPlayer {
     this.mesh.arms[0].children[0].setRotation(0,0, this.velocity.y * 4);
     this.mesh.arms[1].children[0].setRotation(0,0, this.velocity.y * -4);
   }
+}
+
+export function isPlayer(candidate: any): candidate is ThirdPersonPlayer {
+  return candidate.hasOwnProperty('respawnCameraPosition');
 }

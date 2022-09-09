@@ -15,7 +15,6 @@ import {largeTree, leavesMesh, plant1} from "@/modeling/flora";
 import {Level} from "@/game-states/levels/level";
 import {createHole} from "@/modeling/hole";
 import {createSpikedGround} from "@/modeling/spiked-ground";
-import {createProximityMine} from "@/modeling/proximity-mine";
 import {createStartPlatform} from "@/modeling/tee-platform";
 
 
@@ -168,15 +167,13 @@ export function getLevel2() {
   const test = new Mesh(testCube, materials.bricks,);
 
 
-  const mine = createProximityMine();
-  mine.position.set(4, 1, -4);
-
   const spikes = createSpikedGround(10,2);
   spikes.position.set(-5,1.25,10)
 
-  const meshesToRender = [platform, ramp, wall, floor, lake, tree, bridge, test, instancedTest, instancedTest2, treeLeaves, spikes, mine] as Mesh[];
+  const meshesToCollide = [spikes, platform, ramp, wall, floor, lake] as Mesh[];
+  const meshesToRender = [...meshesToCollide, tree, bridge, test, instancedTest, instancedTest2, treeLeaves] as Mesh[];
 
-  const meshesToCollide = [spikes, platform, ramp, wall, floor, lake];
+
   meshesToCollide.forEach(object => object.updateWorldMatrix())
 
   meshesToRender.push(particle);
