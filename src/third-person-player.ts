@@ -103,6 +103,7 @@ export class ThirdPersonPlayer {
 
     this.mesh.setRotation(0, this.angle, 0);
 
+
     if (controls.isJumpPressed && this.canJumpAgain) {
       if (!this.isJumping) {
         this.velocity.y = 0.4;
@@ -114,7 +115,7 @@ export class ThirdPersonPlayer {
       this.canJumpAgain = true;
     }
 
-    this.velocity.y -= 0.025; // gravity
+    this.velocity.y -= 0.02; // gravity
   }
 
   updatePositionFromCollision(collisionDepth?: number) {
@@ -122,6 +123,8 @@ export class ThirdPersonPlayer {
       this.feetCenter.y += collisionDepth;
       this.velocity.y = 0;
       this.isJumping = false;
+    } else {
+      this.canJumpAgain = false;
     }
   }
 

@@ -11,7 +11,7 @@ export function createHole(position: VectorLike): Mesh {
     .computeNormalsCrossPlane()
     .done();
 
-  const hole = new Mesh(geometry, new Material({color: '#333'}));
+  const hole = new Mesh(geometry, new Material({color: '#092'}));
   hole.position.set(position)
   return hole;
 }

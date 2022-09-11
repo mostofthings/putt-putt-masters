@@ -8,6 +8,7 @@ export class Enemy extends Mesh {
   collisionRadius: number;
   height: number;
   isDeadly: boolean;
+  shouldBeRemovedFromScene = false;
   update: () => void;
   onCollide: () => void;
 
@@ -29,6 +30,8 @@ export class Enemy extends Mesh {
     this.update = update
     this.onCollide = onCollide;
     this.isDeadly = isDeadly;
+
+    this.position.set(feetCenter);
   }
 }
 

@@ -19,8 +19,6 @@ export function getLevel1() {
   obstacles[1].position.set(5, -.5, -4);
 
 
-  const platform = createStartPlatform(respawnPoint);
-
   const spikes = createSpikedGround(20, 3);
   spikes.position.set(0, -.5, 4);
 
@@ -29,11 +27,9 @@ export function getLevel1() {
   const enemies = [mine, mine.explosion] as Enemy[];
 
 
-  const meshesToCollide = [mine, platform, spikes, ground, ...obstacles];
+  const meshesToCollide = [mine, spikes, ground, ...obstacles];
   meshesToCollide.forEach(object => object.updateWorldMatrix())
 
-  const meshesToRender = [...meshesToCollide, ...enemies]
 
-
-  return new Level(1, holePosition, respawnPoint, cameraPosition, meshesToCollide, meshesToRender, enemies)
+  return new Level(1, holePosition, respawnPoint, cameraPosition, meshesToCollide, undefined, enemies)
 }

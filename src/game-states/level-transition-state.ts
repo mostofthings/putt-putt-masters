@@ -9,7 +9,7 @@ import {scores} from "@/engine/scores";
 import {getLevel1} from "@/game-states/levels/level-1";
 
 class LevelTransitionState implements State {
-  levels: LevelCallback[] = [getLevel1, getLevel2, getLevel3]
+  levels: LevelCallback[] = [getLevel3]
   currentLevelNumber = -1
   framesElapsed = 0;
 

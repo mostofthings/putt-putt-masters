@@ -13,7 +13,7 @@ class Controls {
   private onMouseMoveCallback?: (mouseMovement: EnhancedDOMPoint) => void;
 
   constructor() {
-    document.addEventListener('keydown', event => this.toggleKey(event, true));
+    document.addEventListener('keydown', event =>{ console.log(event.code); this.toggleKey(event, true); } );
     document.addEventListener('keyup', event => this.toggleKey(event, false));
     const canvas = document.querySelector('#c')!;
     // canvas.addEventListener('click', () => {
@@ -51,21 +51,26 @@ class Controls {
     switch (event.code) {
       case 'KeyW':
       case 'ArrowUp':
+      case 'Numpad8':
         this.isUp = isPressed;
         break;
       case 'KeyS':
       case 'ArrowDown':
+      case 'Numpad5':
         this.isDown = isPressed;
         break;
       case 'KeyA':
       case 'ArrowLeft':
+      case 'Numpad4':
         this.isLeft = isPressed;
         break;
       case 'KeyD':
       case 'ArrowRight':
+      case 'Numpad6':
         this.isRight = isPressed;
         break;
       case 'Enter':
+      case 'NumpadEnter':
         this.isEnter = isPressed;
         break;
       case 'Space':

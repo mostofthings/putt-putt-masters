@@ -15,7 +15,7 @@ class Scores {
     localStorage.setItem(this.key, JSON.stringify(scorecard));
   }
 
-  resetScore(pars: number[]) {
+  resetScores(pars: number[]) {
     this.scorecard = getEmptyScores(pars)
   }
 
