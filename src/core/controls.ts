@@ -13,7 +13,7 @@ class Controls {
   private onMouseMoveCallback?: (mouseMovement: EnhancedDOMPoint) => void;
 
   constructor() {
-    document.addEventListener('keydown', event =>{ console.log(event.code); this.toggleKey(event, true); } );
+    document.addEventListener('keydown', event =>{ this.toggleKey(event, true); } );
     document.addEventListener('keyup', event => this.toggleKey(event, false));
     const canvas = document.querySelector('#c')!;
     // canvas.addEventListener('click', () => {
