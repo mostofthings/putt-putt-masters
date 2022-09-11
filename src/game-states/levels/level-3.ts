@@ -1,9 +1,10 @@
 import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 import {Level} from "@/game-states/levels/level";
 import {createRegularGrass} from "@/modeling/regular-grass";
+import {degreesToRads} from "@/engine/math-helpers";
 
 export function getLevel3() {
-  const holePosition = new EnhancedDOMPoint(0,2,12);
+  const holePosition = new EnhancedDOMPoint(0,4,12);
   const respawnPoint = new EnhancedDOMPoint(0, -1, 0);
   const cameraPosition = new EnhancedDOMPoint(0,5,-20);
 

@@ -23,7 +23,6 @@ export class ProximityMine extends Enemy {
     })
     bodyGeometry.done();
 
-
     const update = () => this.updateExplosion()
     const onCollide = () => { this.explosion.isDeadly = true; }
 
@@ -37,10 +36,6 @@ export class ProximityMine extends Enemy {
 
     // explosion has same feetCenter as otherwise the mine blows itself up
     this.explosion = new Enemy(feetCenter, .25, .25, explosionGeometry, new Material({ color: 'red', isTransparent: true }))
-
-    // this.add(explosion)
-
-
   }
 
   updateExplosion() {
@@ -58,8 +53,6 @@ export class ProximityMine extends Enemy {
     } else {
       this.shouldBeRemovedFromScene = true;
       this.explosion.shouldBeRemovedFromScene = true;
-      // TODO: remove explosion and mine from meshes to render, meshes to collide, and enemies instead of messing
-      // with scale and all this
     }
   }
 }

@@ -10,7 +10,7 @@ import {getLevel1} from "@/game-states/levels/level-1";
 import {gameOverState} from "@/game-states/game-over-state";
 
 class LevelTransitionState implements State {
-  levels: LevelCallback[] = [getLevel3]
+  levels: LevelCallback[] = [getLevel1, getLevel3]
   currentLevelNumber = -1
   framesElapsed = 0;
 

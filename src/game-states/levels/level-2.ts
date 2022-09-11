@@ -53,5 +53,5 @@ export function getLevel2() {
 
   const meshesToCollide = [...platforms, ...spikes, ...mines];
 
-  return new Level(2, holePosition, respawnPoint, cameraPosition, meshesToCollide, undefined, enemies)
+  return new Level(2, holePosition, respawnPoint, cameraPosition, meshesToCollide, enemies)
 }

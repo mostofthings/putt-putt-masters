@@ -5,14 +5,14 @@ import {GroupedFaces} from "@/engine/grouped-faces";
 import {doTimes} from "@/engine/helpers";
 import {createDeadBody} from "@/modeling/golf-ball-man";
 import {getGroupedFaces} from "@/engine/physics/parse-faces";
-import {createHole} from "@/modeling/hole";
+import {Hole} from "@/modeling/hole";
 import {createStartPlatform} from "@/modeling/tee-platform";
 import {Object3d} from "@/engine/renderer/object-3d";
 import {Enemy, isEnemy} from "@/modeling/enemy";
 
 export class Level {
   levelNumber: number;
-  holePosition: EnhancedDOMPoint;
+  hole: Hole;
   respawnPoint: EnhancedDOMPoint;
   cameraPosition: EnhancedDOMPoint;
   scene: Scene = new Scene();
@@ -28,17 +28,17 @@ export class Level {
     respawnPoint: EnhancedDOMPoint,
     cameraPosition: EnhancedDOMPoint,
     meshesToCollide: (Object3d | Mesh | Enemy)[],
-    remainingMeshesToRender: (Object3d | Mesh)[] = [],
     enemies: Enemy[] = [],
+    remainingMeshesToRender: (Object3d | Mesh)[] = [],
     ) {
 
     this.levelNumber = levelNumber;
-    this.holePosition = holePosition;
     this.respawnPoint = respawnPoint;
     this.cameraPosition = cameraPosition;
     this.enemies = enemies;
 
-    const collidableMeshesToAdd = [createHole(holePosition), createStartPlatform(respawnPoint)]
+    this.hole = new Hole(holePosition)
+    const collidableMeshesToAdd = [this.hole, createStartPlatform(respawnPoint)]
 
     doTimes(50, (index) => {
       const body = createDeadBody();

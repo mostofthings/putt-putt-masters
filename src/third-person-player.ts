@@ -8,11 +8,12 @@ import { drawVolcanicRock } from '@/texture-maker';
 import { audioCtx } from '@/engine/audio/audio-player';
 import {GolfBallMan} from "@/modeling/golf-ball-man";
 import {clamp, moveValueTowardsTarget} from "@/engine/helpers";
+import {CollisionCylinder} from "@/modeling/collision-cylinder";
 
 const debugElement = document.querySelector('#debug')!;
 
 
-export class ThirdPersonPlayer {
+export class ThirdPersonPlayer implements CollisionCylinder {
   isJumping = false;
   isDead = false;
   canJumpAgain = true;
