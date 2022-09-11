@@ -3,7 +3,7 @@ import {Level} from "@/game-states/levels/level";
 import {createRegularGrass} from "@/modeling/regular-grass";
 
 export function getLevel3() {
-  const holePosition = new EnhancedDOMPoint(0,-.5,12);
+  const holePosition = new EnhancedDOMPoint(0,2,12);
   const respawnPoint = new EnhancedDOMPoint(0, -1, 0);
   const cameraPosition = new EnhancedDOMPoint(0,5,-20);
 

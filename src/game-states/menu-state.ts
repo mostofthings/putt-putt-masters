@@ -43,7 +43,7 @@ class MenuState implements State {
   }
 
   onUpdate() {
-    this.clear2DContext();
+    drawEngine.clearContext();
     this.scene.updateWorldMatrix();
 
     renderer.render(this.camera, this.scene);
@@ -75,7 +75,7 @@ class MenuState implements State {
   }
 
   onLeave() {
-    this.clear2DContext();
+    drawEngine.clearContext();
   }
 
   drawMenu() {
@@ -84,10 +84,6 @@ class MenuState implements State {
     this.options.forEach((option, index) => {
       drawEngine.drawText(option, 50, halfWidth, (index * 55) + 500, index === this.selectedOptionIndex ? 'blue' : 'white');
     })
-  }
-
-  clear2DContext() {
-    drawEngine.context.clearRect(0,0,drawEngine.width, drawEngine.height);
   }
 }
 

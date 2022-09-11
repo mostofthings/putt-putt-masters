@@ -194,7 +194,7 @@ class GameState implements State {
     const halfWidth = drawEngine.width / 2;
     const halfHeight = drawEngine.height / 2;
 
-    drawEngine.context.clearRect(0, 0, drawEngine.width, drawEngine.height);
+    drawEngine.clearContext();
 
     drawEngine.drawText(
       `Hole ${ this.levelNumber }
@@ -207,7 +207,6 @@ class GameState implements State {
       drawEngine.drawText(`You Died`, 40, halfWidth, halfHeight);
       drawEngine.drawText(`Plus one stroke`, 20, halfWidth, halfHeight + 25);
     }
-
   }
 
   get levelNumber() {
