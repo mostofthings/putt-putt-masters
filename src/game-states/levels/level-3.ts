@@ -109,9 +109,9 @@ export function getLevel3() {
   doTimes(count2, () => {
     const translateX = getRandomArbitrary(-127, 127);
     const translateZ = getRandomArbitrary(-127, 127);
-    const translateY = findFloorHeightAtPosition(terrain.floorFaces, new EnhancedDOMPoint(translateX, 500, translateZ))!.height;
 
-    const transformMatrix = new DOMMatrix().translate(translateX, translateY, translateZ).rotate(0, getRandomArbitrary(-90, 90), 0);
+
+    const transformMatrix = new DOMMatrix().translate(translateX, 0, translateZ).rotate(0, getRandomArbitrary(-90, 90), 0);
     // Using the transform matrix as the normal matrix is of course not strictly correct, but it largely works as long as the
     // transform matrix doesn't heavily squash the mesh and this avoids having to write a matrix transpose method just for
     // instanced drawing.
