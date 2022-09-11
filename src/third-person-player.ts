@@ -8,11 +8,12 @@ import { drawVolcanicRock } from '@/texture-maker';
 import { audioCtx } from '@/engine/audio/audio-player';
 import {GolfBallMan} from "@/modeling/golf-ball-man";
 import {clamp, moveValueTowardsTarget} from "@/engine/helpers";
+import {CollisionCylinder} from "@/modeling/collision-cylinder";
 
 const debugElement = document.querySelector('#debug')!;
 
 
-export class ThirdPersonPlayer {
+export class ThirdPersonPlayer implements CollisionCylinder {
   isJumping = false;
   isDead = false;
   canJumpAgain = true;
@@ -103,6 +104,7 @@ export class ThirdPersonPlayer {
 
     this.mesh.setRotation(0, this.angle, 0);
 
+
     if (controls.isJumpPressed && this.canJumpAgain) {
       if (!this.isJumping) {
         this.velocity.y = 0.4;
@@ -114,7 +116,7 @@ export class ThirdPersonPlayer {
       this.canJumpAgain = true;
     }
 
-    this.velocity.y -= 0.025; // gravity
+    this.velocity.y -= 0.02; // gravity
   }
 
   updatePositionFromCollision(collisionDepth?: number) {
@@ -122,6 +124,8 @@ export class ThirdPersonPlayer {
       this.feetCenter.y += collisionDepth;
       this.velocity.y = 0;
       this.isJumping = false;
+    } else {
+      this.canJumpAgain = false;
     }
   }
 

@@ -1,4 +1,5 @@
-import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
+import {EnhancedDOMPoint, VectorLike} from "@/engine/enhanced-dom-point";
+import {CollisionCylinder} from "@/modeling/collision-cylinder";
 
 export function radsToDegrees(radians: number): number {
   return radians * (180 / Math.PI)
@@ -34,6 +35,22 @@ export function calculateVertexNormals(points: EnhancedDOMPoint[], indices: numb
 export function isPointInRadius(pointToEval: EnhancedDOMPoint, centerPoint: EnhancedDOMPoint, radius: number): boolean {
   const distance = new EnhancedDOMPoint().subtractVectors(pointToEval, centerPoint).magnitude;
   return distance < radius
+}
+
+export function areCylindersColliding(cylinder1: CollisionCylinder, cylinder2: CollisionCylinder): true | undefined {
+  if (cylinder1.feetCenter.y + cylinder1.height < cylinder2.feetCenter.y) {
+    return
+  }
+
+  if (cylinder1.feetCenter.y > cylinder2.feetCenter.y + cylinder2.height) {
+    return;
+  }
+
+  const magnitude = Math.sqrt(Math.pow((cylinder2.feetCenter.x - cylinder1.feetCenter.x), 2) + Math.pow((cylinder2.feetCenter.z - cylinder1.feetCenter.z), 2));
+
+  if (magnitude < cylinder1.collisionRadius + cylinder2.collisionRadius) {
+    return true;
+  }
 }
 
 export function getRandomArbitrary(min: number, max: number) {

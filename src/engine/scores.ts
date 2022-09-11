@@ -15,7 +15,7 @@ class Scores {
     localStorage.setItem(this.key, JSON.stringify(scorecard));
   }
 
-  resetScore(pars: number[]) {
+  resetScores(pars: number[]) {
     this.scorecard = getEmptyScores(pars)
   }
 
@@ -32,18 +32,34 @@ class Scores {
   }
 
   drawScorecard() {
-    let yOffset = 170;
-    drawEngine.drawText('Par', 22, 420, yOffset)
-    drawEngine.drawText('Score', 22, 620, yOffset)
-    // @ts-ignore
+    let yOffset = 20;
+    const halfWidth = drawEngine.width /2
+    const xOffsets = [halfWidth -300, halfWidth - 100, halfWidth + 100];
+    drawEngine.drawText('Par', 22, xOffsets[1], yOffset)
+    drawEngine.drawText('Score', 22, xOffsets[2], yOffset)
+
     this.scorecard.forEach(levelScore => {
-      yOffset += 30
+      yOffset += 24
       const {score, hole, par} = levelScore;
-      drawEngine.context.rect(200, 200 + (yOffset), 250, 25)
-      drawEngine.drawText(`Hole ${hole}`, 22, 220, yOffset + 2)
-      drawEngine.drawText(par.toString(), 22, 420, yOffset + 2)
-      drawEngine.drawText(score === -1 ? '' : score.toString(), 22, 620, yOffset + 2)
+      drawEngine.context.strokeStyle = 'white';
+      drawEngine.context.lineWidth = 3;
+      drawEngine.context.strokeRect(xOffsets[1] - 100, yOffset - 18, 200, 24);
+      drawEngine.context.strokeRect(xOffsets[2] - 100, yOffset - 18, 200, 24);
+      drawEngine.drawText(`Hole ${hole}`, 22, xOffsets[0], yOffset + 2)
+      drawEngine.drawText(par as unknown as string, 20, xOffsets[1], yOffset + 2)
+      drawEngine.drawText(score === -1 ? '' : score as unknown as string, 20, xOffsets[2], yOffset + 2)
     })
+
+    yOffset += 24
+    const {par, score } = this.scorecard
+      .filter(levelScore => levelScore.score !== -1)
+      .reduce((previous, current) => {
+        previous.par += current.par;
+        previous.score += current.score - current.par;
+        return previous;
+      }, { par: 0, score: 0 })
+    drawEngine.drawText(par as unknown as string, 20, xOffsets[1], yOffset + 2)
+    drawEngine.drawText(score as unknown as string, 20, xOffsets[2], yOffset + 2)
   }
 
   get nextHole() {

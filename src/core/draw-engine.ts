@@ -30,7 +30,7 @@ class DrawEngine {
   drawText(text: string, fontSize: number, x: number, y: number, color = 'white', textAlign: 'center' | 'left' | 'right' = 'center') {
     const context = this.context;
 
-    context.font = `${fontSize}px Impact, sans-serif-black`;
+    context.font = `${fontSize}px Lucida Console, sans-serif-black`;
     context.textAlign = textAlign;
     context.strokeStyle = 'black';
     context.lineWidth = 4;
@@ -38,6 +38,11 @@ class DrawEngine {
     context.fillStyle = color;
     context.fillText(text, x, y);
   }
+
+  clearContext() {
+    this.context.clearRect(0, 0, this.width, this.height);
+  }
 }
+
 
 export const drawEngine = new DrawEngine();

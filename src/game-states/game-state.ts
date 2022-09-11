@@ -2,10 +2,8 @@ import { State } from '@/core/state';
 import { audioCtx, getAudioPlayer, panner } from '@/engine/audio/audio-player';
 import { Skybox } from '@/skybox';
 import { skyboxes,} from '@/texture-maker';
-import { Scene } from '@/engine/renderer/scene';
 import { Camera } from '@/engine/renderer/camera';
 import { renderer } from '@/engine/renderer/renderer';
-import { Face } from '@/engine/physics/face';
 import { controls } from '@/core/controls';
 import { getGameStateMachine } from '@/game-state-machine';
 import { menuState } from '@/game-states/menu-state';
@@ -14,11 +12,8 @@ import {Level} from "@/game-states/levels/level";
 import {LevelCallback} from "@/game-states/levels/level-callback";
 import {findFloorHeightAtPosition, findWallCollisionsFromList} from "@/engine/physics/surface-collision";
 import {GroupedFaces} from "@/engine/grouped-faces";
-import {EnhancedDOMPoint, VectorLike} from "@/engine/enhanced-dom-point";
-import {Mesh} from "@/engine/renderer/mesh";
-import {doTimes} from "@/engine/helpers";
-import {createDeadBody, GolfBallMan} from "@/modeling/golf-ball-man";
-import {degreesToRads, isPointInRadius, radsToDegrees} from "@/engine/math-helpers";
+import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
+import {areCylindersColliding} from "@/engine/math-helpers";
 import {drawEngine} from "@/core/draw-engine";
 import {pars} from "@/game-states/levels/pars";
 import {scores} from "@/engine/scores";
@@ -58,11 +53,6 @@ class GameState implements State {
     // audio.loop = true;
     audio.connect(panner).connect(audioCtx.destination);
     // audio.start();
-
-
-
-// @ts-ignore
-
   }
 
   onUpdate(timeElapsed: number): void {
@@ -76,6 +66,10 @@ class GameState implements State {
     )
     this.player.updatePositionFromCollision(collisionDepth)
 
+    // remove dead enemies
+    this.removeStaleEnemiesFromScene();
+
+    // update remaining enemies
     this.level.enemies.forEach(enemy => enemy.update());
 
     // check player for collide with enemies; call onCollide
@@ -84,19 +78,19 @@ class GameState implements State {
     // check enemies for collide with each other and the player;
     this.level.enemies.forEach(enemy => this.collideWithEnemies(enemy, [...this.level.enemies, this.player]));
 
-    if (isPointInRadius(this.player.feetCenter, this.level.holePosition, .8)) {
+    if (areCylindersColliding(this.level.hole, this.player)) {
       getGameStateMachine().setState(levelTransitionState, this.levelNumber + 1)
     }
+
+    if (this.player.feetCenter.y < -30 ) {
+      this.killPlayer(false);
+    }
+
+    this.drawHUD();
 
     this.level.scene.updateWorldMatrix();
 
     renderer.render(this.player.camera, this.level.scene);
-
-    drawEngine.drawText(
-      `Hole ${ this.levelNumber }
-      Par ${ pars[this.levelNumber - 1]}
-      Current Stroke: ${ scores.getLevelScore(this.levelNumber) }`
-      , 25, 600,  30, 'white');
 
     if (controls.isEscape) {
       getGameStateMachine().setState(menuState);
@@ -128,6 +122,12 @@ class GameState implements State {
     return collisionDepth;
   }
 
+  removeStaleEnemiesFromScene() {
+    this.level.enemies.filter(enemy => enemy.shouldBeRemovedFromScene)
+      .forEach((enemy) => this.level.scene.remove(enemy));
+    this.level.enemies = this.level.enemies.filter(enemy => !enemy.shouldBeRemovedFromScene);
+  }
+
 
   collideWithEnemies(toCollide: ThirdPersonPlayer | Enemy, enemies: (Enemy | ThirdPersonPlayer)[]) {
     for (const enemy of enemies) {
@@ -136,17 +136,7 @@ class GameState implements State {
         continue;
       }
 
-      if (toCollide.feetCenter.y + toCollide.height < enemy.feetCenter.y) {
-        continue;
-      }
-
-      if (toCollide.feetCenter.y > enemy.feetCenter.y + enemy.height) {
-        continue;
-      }
-
-      const magnitude = Math.sqrt(Math.pow((enemy.feetCenter.x - toCollide.feetCenter.x), 2) + Math.pow((enemy.feetCenter.z - toCollide.feetCenter.z), 2));
-
-      if (magnitude >= toCollide.collisionRadius + enemy.collisionRadius) {
+      if (!areCylindersColliding(toCollide, enemy)) {
         continue;
       }
 
@@ -160,26 +150,48 @@ class GameState implements State {
     }
   }
 
-  private killPlayer() {
+  private killPlayer(shouldShowDeadBody: boolean = true) {
     // you can only die once 🤵
     if (this.player.isDead) {
       return;
     }
     this.player.isDead = true;
     scores.setLevelScore(this.levelNumber, scores.getLevelScore(this.levelNumber) + 1);
-    setTimeout(() => this.respawnPlayer(), 3000);
+    setTimeout(() => this.respawnPlayer(shouldShowDeadBody), 3000);
   }
 
-  respawnPlayer() {
-    const bodyToMove = this.level.deadBodies[scores.getLevelScore(this.levelNumber) - 1];
-    bodyToMove.position.set(this.player.feetCenter)
-    const floorFace = findFloorHeightAtPosition(this.level.groupedFaces.floorFaces, this.player.feetCenter);
-    if (floorFace) {
-      bodyToMove.position.y = floorFace.height + .7;
+  respawnPlayer(shouldShowDeadBody: boolean) {
+    if (shouldShowDeadBody){
+      const bodyToMove = this.level.deadBodies[scores.getLevelScore(this.levelNumber) - 1];
+      bodyToMove.position.set(this.player.feetCenter)
+      const floorFace = findFloorHeightAtPosition(this.level.groupedFaces.floorFaces, this.player.feetCenter);
+      if (floorFace) {
+        bodyToMove.position.y = floorFace.height + .7;
+      }
+      bodyToMove.updateWorldMatrix(); // this may be unnecessary
     }
-    bodyToMove.updateWorldMatrix(); // this may be unnecessary
+
     this.level.updateGroupedFaces();
     this.player.respawn();
+  }
+
+  drawHUD() {
+    const halfWidth = drawEngine.width / 2;
+    const halfHeight = drawEngine.height / 2;
+
+    drawEngine.clearContext();
+
+    drawEngine.drawText(
+      `Hole ${ this.levelNumber }
+      Par ${ pars[this.levelNumber - 1]}
+      Current Stroke: ${ scores.getLevelScore(this.levelNumber) }`
+      , 25, halfWidth,  30);
+
+
+    if (this.player.isDead) {
+      drawEngine.drawText(`You Died`, 40, halfWidth, halfHeight);
+      drawEngine.drawText(`Plus one stroke`, 20, halfWidth, halfHeight + 25);
+    }
   }
 
   get levelNumber() {

@@ -5,14 +5,14 @@ import {GroupedFaces} from "@/engine/grouped-faces";
 import {doTimes} from "@/engine/helpers";
 import {createDeadBody} from "@/modeling/golf-ball-man";
 import {getGroupedFaces} from "@/engine/physics/parse-faces";
-import {createHole} from "@/modeling/hole";
+import {Hole} from "@/modeling/hole";
 import {createStartPlatform} from "@/modeling/tee-platform";
 import {Object3d} from "@/engine/renderer/object-3d";
-import {Enemy} from "@/modeling/enemy";
+import {Enemy, isEnemy} from "@/modeling/enemy";
 
 export class Level {
   levelNumber: number;
-  holePosition: EnhancedDOMPoint;
+  hole: Hole;
   respawnPoint: EnhancedDOMPoint;
   cameraPosition: EnhancedDOMPoint;
   scene: Scene = new Scene();
@@ -23,40 +23,42 @@ export class Level {
   groupedFaces!: GroupedFaces;
 
   constructor(
-      levelNumber: number,
-      holePosition: EnhancedDOMPoint,
-      respawnPoint: EnhancedDOMPoint,
-      cameraPosition: EnhancedDOMPoint,
-      meshesToCollide: (Object3d | Mesh)[],
-      meshesToRender: (Object3d | Mesh)[],
-      enemies: Enemy[] = [],
+    levelNumber: number,
+    holePosition: EnhancedDOMPoint,
+    respawnPoint: EnhancedDOMPoint,
+    cameraPosition: EnhancedDOMPoint,
+    meshesToCollide: (Object3d | Mesh | Enemy)[],
+    enemies: Enemy[] = [],
+    remainingMeshesToRender: (Object3d | Mesh)[] = [],
     ) {
 
     this.levelNumber = levelNumber;
-    this.holePosition = holePosition;
     this.respawnPoint = respawnPoint;
     this.cameraPosition = cameraPosition;
     this.enemies = enemies;
-    this.meshesToCollide = meshesToCollide as Mesh[];
-    this.meshesToRender = meshesToRender as Mesh[];
 
-    const collidableMeshesToAdd = [createHole(holePosition), createStartPlatform(respawnPoint)]
+    this.hole = new Hole(holePosition)
+    const collidableMeshesToAdd = [this.hole, createStartPlatform(respawnPoint)]
 
     doTimes(50, (index) => {
       const body = createDeadBody();
       body.position.set(1000, 0, 0)
       collidableMeshesToAdd.push(body);
       this.deadBodies.push(body)
-    })
-    this.meshesToRender.unshift(...collidableMeshesToAdd);
-    this.meshesToCollide.unshift(...collidableMeshesToAdd);
+    });
+
+    this.meshesToCollide = [...meshesToCollide, ...collidableMeshesToAdd] as Mesh[];
+    this.meshesToRender = [...remainingMeshesToRender, ...this.meshesToCollide, ...this.enemies] as Mesh[];
+    /// TODO: this may be unnecessary
     this.meshesToCollide.forEach(mesh => mesh.updateWorldMatrix());
 
     this.updateGroupedFaces();
-    this.scene.add(...meshesToRender);
+    this.scene.add(...this.meshesToRender);
   }
 
   updateGroupedFaces() {
+    // remove collision for dead enemies
+    this.meshesToCollide = this.meshesToCollide.filter(meshOrEnemy => !isEnemy(meshOrEnemy) || !meshOrEnemy.shouldBeRemovedFromScene)
     this.groupedFaces = getGroupedFaces(this.meshesToCollide)
   }
 }

@@ -2,12 +2,14 @@ import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 import {Mesh} from "@/engine/renderer/mesh";
 import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 import {Material} from "@/engine/renderer/material";
+import {CollisionCylinder} from "@/modeling/collision-cylinder";
 
-export class Enemy extends Mesh {
+export class Enemy extends Mesh implements CollisionCylinder {
   feetCenter: EnhancedDOMPoint;
   collisionRadius: number;
   height: number;
   isDeadly: boolean;
+  shouldBeRemovedFromScene = false;
   update: () => void;
   onCollide: () => void;
 
@@ -29,6 +31,8 @@ export class Enemy extends Mesh {
     this.update = update
     this.onCollide = onCollide;
     this.isDeadly = isDeadly;
+
+    this.position.set(feetCenter);
   }
 }
 
