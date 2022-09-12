@@ -26,9 +26,17 @@ export function getLevel1() {
   const enemies = [mine, mine.explosion] as Enemy[];
 
 
-  const meshesToCollide = [ground, ...spikes];
-  meshesToCollide.forEach(object => object.updateWorldMatrix())
+  const staticMeshesToCollide = [ground, ...spikes];
 
 
-  return new Level(1, holePosition, respawnPoint, cameraPosition, meshesToCollide, enemies)
+  return new Level(
+    1,
+    holePosition,
+    respawnPoint,
+    cameraPosition,
+    [...staticMeshesToCollide, ...enemies],
+    staticMeshesToCollide,
+    undefined,
+    enemies
+  )
 }

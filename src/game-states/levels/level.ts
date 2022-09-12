@@ -20,50 +20,75 @@ export class Level {
   deadBodies: Mesh[] = [];
   enemies: Enemy[];
   meshesToRender: Mesh[];
-  meshesToCollide: (Mesh | MovingMesh)[];
+  staticMeshesToCollide: Mesh[];
+  dynamicMeshesToCollide: (Mesh | MovingMesh)[];
   groupedFaces!: GroupedFaces;
+  staticGroupedFaces!: GroupedFaces;
+  dynamicGroupedFaces!: GroupedFaces;
 
   constructor(
     levelNumber: number,
     holePosition: EnhancedDOMPoint,
     respawnPoint: EnhancedDOMPoint,
     cameraPosition: EnhancedDOMPoint,
-    meshesToCollide: (Object3d | Mesh | Enemy | MovingMesh)[],
+    meshesToRender: Mesh[],
+    meshesToCollide: (Object3d | Mesh | Enemy)[],
+    dynamicMeshesToCollide: (Mesh | MovingMesh)[] = [],
     enemies: Enemy[] = [],
-    remainingMeshesToRender: (Object3d | Mesh)[] = [],
     ) {
 
     this.levelNumber = levelNumber;
     this.respawnPoint = respawnPoint;
     this.cameraPosition = cameraPosition;
+    this.dynamicMeshesToCollide = dynamicMeshesToCollide;
     this.enemies = enemies;
 
     this.hole = new Hole(holePosition)
-    const collidableMeshesToAdd = [this.hole, createStartPlatform(respawnPoint)]
+    const holeAndStartPlatform = [this.hole, createStartPlatform(respawnPoint)]
 
     doTimes(50, (index) => {
       const body = createDeadBody();
       body.position.set(1000, 0, 0)
-      collidableMeshesToAdd.push(body);
+      holeAndStartPlatform.push(body);
       this.deadBodies.push(body)
     });
 
-    this.meshesToCollide = [...meshesToCollide, ...collidableMeshesToAdd] as Mesh[];
-    this.meshesToRender = [...remainingMeshesToRender, ...this.meshesToCollide, ...this.enemies] as Mesh[];
+    this.staticMeshesToCollide = [...meshesToCollide, ...holeAndStartPlatform] as Mesh[];
     /// TODO: this may be unnecessary
-    this.meshesToCollide.forEach(mesh => mesh.updateWorldMatrix());
+    this.staticMeshesToCollide.forEach(mesh => mesh.updateWorldMatrix());
 
-    this.updateGroupedFaces();
+    this.updateAllGroupedFaces();
+    this.meshesToRender = [...meshesToRender, ...holeAndStartPlatform];
     this.scene.add(...this.meshesToRender);
   }
 
-  updateGroupedFaces() {
-    // remove collision for dead enemies
-    this.meshesToCollide = this.meshesToCollide.filter(meshOrEnemy => !isEnemy(meshOrEnemy) || !meshOrEnemy.shouldBeRemovedFromScene)
-    this.groupedFaces = getGroupedFaces(this.meshesToCollide)
+  updateAllGroupedFaces() {
+    // remove collision for dead enemies, add for dead bodies
+    this.staticMeshesToCollide = this.staticMeshesToCollide.filter(meshOrEnemy => !isEnemy(meshOrEnemy) || !meshOrEnemy.shouldBeRemovedFromScene)
+    this.staticGroupedFaces = getGroupedFaces(this.staticMeshesToCollide)
+    this.updateDynamicGroupedFaces();
   }
 
-  get movingMeshes(): MovingMesh[] {
-    return this.meshesToCollide.filter(mesh => isMovingMesh(mesh)) as MovingMesh[];
+  updateDynamicMeshPosition() {
+    if (!this.dynamicMeshesToCollide.length) {
+      return;
+    }
+    // move platforms and stuff
+    this.dynamicMeshesToCollide.forEach(mesh => {
+      if (isMovingMesh(mesh)) {
+        mesh.update()
+      }
+    } );
+    this.updateDynamicGroupedFaces();
   }
+
+  updateDynamicGroupedFaces() {
+    this.dynamicGroupedFaces = getGroupedFaces(this.dynamicMeshesToCollide);
+    this.groupedFaces = {
+      floorFaces: [...this.dynamicGroupedFaces.floorFaces, ...this.staticGroupedFaces.floorFaces],
+      wallFaces: [...this.dynamicGroupedFaces.wallFaces, ...this.staticGroupedFaces.wallFaces],
+      ceilingFaces: [...this.dynamicGroupedFaces.ceilingFaces, ...this.staticGroupedFaces.ceilingFaces],
+    }
+  }
+
 }

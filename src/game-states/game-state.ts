@@ -58,9 +58,7 @@ class GameState implements State {
 
   onUpdate(timeElapsed: number): void {
     // move any platform or anything that's supposed to move
-    if (this.level.movingMeshes.length) {
-      this.level.movingMeshes.forEach(movingMesh => movingMesh.update());
-    }
+    this.level.updateDynamicMeshPosition()
 
     this.player.update();
     // player collision call
@@ -177,7 +175,7 @@ class GameState implements State {
       bodyToMove.updateWorldMatrix(); // this may be unnecessary
     }
 
-    this.level.updateGroupedFaces();
+    this.level.updateAllGroupedFaces();
     this.player.respawn();
   }
 

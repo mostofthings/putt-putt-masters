@@ -58,7 +58,16 @@ export function getLevel3() {
 
 
 
-  const meshesToCollide = [...platforms, ...spikes, mine];
+  const staticMeshesToCollide = [...platforms, ...spikes, mine];
 
-  return new Level(3, holePosition, respawnPoint, cameraPosition, meshesToCollide, enemies)
+  return new Level(
+    3,
+    holePosition,
+    respawnPoint,
+    cameraPosition,
+    [...staticMeshesToCollide, ...enemies],
+    staticMeshesToCollide,
+    undefined,
+    enemies,
+  )
 }

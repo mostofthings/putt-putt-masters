@@ -46,7 +46,7 @@ export function areCylindersColliding(cylinder1: CollisionCylinder, cylinder2: C
     return;
   }
 
-  const magnitude = Math.sqrt(Math.pow((cylinder2.feetCenter.x - cylinder1.feetCenter.x), 2) + Math.pow((cylinder2.feetCenter.z - cylinder1.feetCenter.z), 2));
+  const magnitude = Math.hypot((cylinder2.feetCenter.x - cylinder1.feetCenter.x),(cylinder2.feetCenter.z - cylinder1.feetCenter.z) );
 
   if (magnitude < cylinder1.collisionRadius + cylinder2.collisionRadius) {
     return true;

@@ -42,7 +42,16 @@ export function getLevel2() {
 
   const enemies = mines.flatMap(mine => [mine, mine.explosion]);
 
-  const meshesToCollide = [...platforms, ...spikes, ...mines];
+  const staticMeshesToCollide = [...platforms, ...spikes, ...mines];
 
-  return new Level(2, holePosition, respawnPoint, cameraPosition, meshesToCollide, enemies)
+  return new Level(
+    2,
+    holePosition,
+    respawnPoint,
+    cameraPosition,
+    [...staticMeshesToCollide, ...enemies],
+    staticMeshesToCollide,
+    undefined,
+    enemies
+  )
 }
