@@ -19,7 +19,6 @@ export class MovingMesh extends Mesh {
   }
 
   update() {
-    console.log(this)
     if (this.isIncrease) {
       this.position.add(this.movementVector);
       this.distanceTraveled += this.movementVector.magnitude;
