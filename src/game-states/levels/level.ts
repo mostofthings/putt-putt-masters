@@ -9,6 +9,7 @@ import {Hole} from "@/modeling/hole";
 import {createStartPlatform} from "@/modeling/tee-platform";
 import {Object3d} from "@/engine/renderer/object-3d";
 import {Enemy, isEnemy} from "@/modeling/enemy";
+import {isMovingMesh, MovingMesh} from "@/modeling/MovingMesh";
 
 export class Level {
   levelNumber: number;
@@ -19,7 +20,7 @@ export class Level {
   deadBodies: Mesh[] = [];
   enemies: Enemy[];
   meshesToRender: Mesh[];
-  meshesToCollide: Mesh[];
+  meshesToCollide: (Mesh | MovingMesh)[];
   groupedFaces!: GroupedFaces;
 
   constructor(
@@ -27,7 +28,7 @@ export class Level {
     holePosition: EnhancedDOMPoint,
     respawnPoint: EnhancedDOMPoint,
     cameraPosition: EnhancedDOMPoint,
-    meshesToCollide: (Object3d | Mesh | Enemy)[],
+    meshesToCollide: (Object3d | Mesh | Enemy | MovingMesh)[],
     enemies: Enemy[] = [],
     remainingMeshesToRender: (Object3d | Mesh)[] = [],
     ) {
@@ -60,5 +61,9 @@ export class Level {
     // remove collision for dead enemies
     this.meshesToCollide = this.meshesToCollide.filter(meshOrEnemy => !isEnemy(meshOrEnemy) || !meshOrEnemy.shouldBeRemovedFromScene)
     this.groupedFaces = getGroupedFaces(this.meshesToCollide)
+  }
+
+  get movingMeshes(): MovingMesh[] {
+    return this.meshesToCollide.filter(mesh => isMovingMesh(mesh)) as MovingMesh[];
   }
 }

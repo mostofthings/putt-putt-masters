@@ -19,6 +19,7 @@ import {pars} from "@/game-states/levels/pars";
 import {scores} from "@/engine/scores";
 import {levelTransitionState} from "@/game-states/level-transition-state";
 import {Enemy, isEnemy} from "@/modeling/enemy";
+import {MovingMesh} from "@/modeling/MovingMesh";
 
 const debugElement = document.querySelector('#debug')!;
 
@@ -56,6 +57,11 @@ class GameState implements State {
   }
 
   onUpdate(timeElapsed: number): void {
+    // move any platform or anything that's supposed to move
+    if (this.level.movingMeshes.length) {
+      this.level.movingMeshes.forEach(movingMesh => movingMesh.update());
+    }
+
     this.player.update();
     // player collision call
     const collisionDepth = this.collideWithLevel(

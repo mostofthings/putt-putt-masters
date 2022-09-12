@@ -2,6 +2,7 @@ import { Face } from './face';
 import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 import { AttributeLocation } from '@/engine/renderer/renderer';
 import { Mesh } from '@/engine/renderer/mesh';
+import {GroupedFaces} from "@/engine/grouped-faces";
 
 function indexToFaceVertexPoint(index: number, positionData: Float32Array, matrix: DOMMatrix): EnhancedDOMPoint {
   return new EnhancedDOMPoint().set(
@@ -9,7 +10,7 @@ function indexToFaceVertexPoint(index: number, positionData: Float32Array, matri
   )
 }
 
-export function getGroupedFaces(meshes: Mesh[]) {
+export function getGroupedFaces(meshes: Mesh[]): GroupedFaces {
   const faces = meshes.flatMap(mesh => {
     const indices = mesh.geometry.getIndices()!; // assuming always having indices
 

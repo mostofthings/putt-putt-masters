@@ -16,7 +16,7 @@ class Scores {
   }
 
   resetScores(pars: number[]) {
-    this.scorecard = getEmptyScores(pars)
+    this.scorecard = this.getEmptyScores(pars)
   }
 
   getLevelScore(levelNumber: number): number {
@@ -62,24 +62,29 @@ class Scores {
     drawEngine.drawText(score as unknown as string, 20, xOffsets[2], yOffset + 2)
   }
 
-  get nextHole() {
-    return this.scorecard
-      .filter(score => score.score === -1)
+  get nextIncompleteHole(): number {
+    const completedHoles = this.scorecard
+      .filter(score => score.score !== -1)
       .map(score => score.hole)
-      .reduce((prev, current) => {
-        return prev < current ? prev : current;
+      .sort()
+    return completedHoles[completedHoles.length -1];
+  }
+
+  private getEmptyScores(pars: number[]) {
+    return pars.map((par, index) => {
+      return {
+        par,
+        hole: index + 1,
+        score: -1,
+      }
     })
+  }
+
+  get isScorecardComplete(): boolean {
+    return !this.scorecard.filter(score => score.score === -1).length;
   }
 }
 
-function getEmptyScores(pars: number[]) {
-  return pars.map((par, index) => {
-    return {
-      par,
-      hole: index + 1,
-      score: -1,
-    }
-  })
-}
+
 
 export const scores = new Scores();
