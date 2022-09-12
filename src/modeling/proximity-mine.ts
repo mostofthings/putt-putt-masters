@@ -5,12 +5,13 @@ import {doTimes} from "@/engine/helpers";
 import {degreesToRads} from "@/engine/math-helpers";
 import {createSpike} from "@/modeling/spike";
 import {Enemy} from "@/modeling/enemy";
-import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
+import {EnhancedDOMPoint, VectorLike} from "@/engine/enhanced-dom-point";
 
 export class ProximityMine extends Enemy {
   explosion: Enemy;
 
-  constructor(feetCenter: EnhancedDOMPoint) {
+  constructor(x: number , y: number, z: number) {
+    const feetCenter = new EnhancedDOMPoint(x, y, z);
     const bodyGeometry = new MoldableCubeGeometry(1.5,1,1.5,4,1,4)
       .cylindrify(.75)
 

@@ -57,6 +57,7 @@ export class ThirdPersonPlayer implements CollisionCylinder {
       this.moveAppendages();
     } if (this.isDead) {
       this.velocity.x = 0;
+      this.velocity.y -= .02;
       this.velocity.z = 0;
     }
 
@@ -147,6 +148,7 @@ export class ThirdPersonPlayer implements CollisionCylinder {
     this.isDead = false;
     this.mesh.position.set(this.respawnPoint);
     this.mesh.position.y += 8;
+    this.velocity.y = 0;
     this.feetCenter.set(this.mesh.position);
     this.camera.position.set(this.respawnCameraPosition);
   }

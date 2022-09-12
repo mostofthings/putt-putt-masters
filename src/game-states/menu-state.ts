@@ -37,7 +37,7 @@ class MenuState implements State {
     this.camera.position = new EnhancedDOMPoint(0, 0, -17);
 
     this.options = ['New Game'];
-    if (scores.scorecard) {
+    if (scores.scorecard && !scores.isScorecardComplete) {
       this.options.push('Resume');
     }
   }
@@ -69,7 +69,9 @@ class MenuState implements State {
           getGameStateMachine().setState(levelTransitionState, 1);
           break;
         case 1:
-          getGameStateMachine().setState(levelTransitionState, scores.nextHole)
+          const nextHole = scores.nextIncompleteHole;
+          scores.setLevelScore(nextHole, -1);
+          getGameStateMachine().setState(levelTransitionState, nextHole)
       }
     }
   }

@@ -5,9 +5,12 @@ import {createStartPlatform} from "@/modeling/tee-platform";
 import {createSpikedGround} from "@/modeling/spiked-ground";
 import {ProximityMine} from "@/modeling/proximity-mine";
 import {Enemy} from "@/modeling/enemy";
+import {MovingMesh} from "@/modeling/MovingMesh";
+import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
+import {degreesToRads} from "@/engine/math-helpers";
 
 // par 3
-export function getLevel1() {
+export function getLevel4() {
   const holePosition = new EnhancedDOMPoint(0,-.5,15);
   const respawnPoint = new EnhancedDOMPoint(0, -.5, -20);
   const cameraPosition = new EnhancedDOMPoint(0,5,-20);
@@ -25,18 +28,28 @@ export function getLevel1() {
 
   const enemies = [mine, mine.explosion] as Enemy[];
 
+  const platform = createRegularGrass(5, 5);
+  const movingPlatform = new MovingMesh(platform.geometry as MoldableCubeGeometry, platform.material, new EnhancedDOMPoint(0,0,.1), 10);
+  const movingSpikes = createSpikedGround(2.5, 2.5)
+  movingSpikes.scale.set(2, 1, 2);
+  // movingSpikes.rotate(degreesToRads(180), 0, 0);
+  movingSpikes.position.set(0, 1, 0);
+  movingPlatform.add(movingSpikes);
+  movingPlatform.position.set(3, 2, -15);
 
-  const staticMeshesToCollide = [ground, ...spikes];
+
+  const staticMeshesToCollide = [mine, ground, ...spikes];
+  staticMeshesToCollide.forEach(object => object.updateWorldMatrix())
 
 
   return new Level(
-    1,
+    4,
     holePosition,
     respawnPoint,
     cameraPosition,
-    [...staticMeshesToCollide, ...enemies],
+    [...staticMeshesToCollide, movingPlatform, ...enemies],
     staticMeshesToCollide,
-    undefined,
+    [movingPlatform, movingSpikes],
     enemies
   )
 }
