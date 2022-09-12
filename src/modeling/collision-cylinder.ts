@@ -4,5 +4,5 @@ export interface CollisionCylinder {
   feetCenter: EnhancedDOMPoint;
   height: number;
   collisionRadius: number;
-  collisionOffsetY?: number;
+  offsetY?: number;
 }

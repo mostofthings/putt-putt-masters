@@ -1,9 +1,6 @@
 import { Face } from './face';
 import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 
-// TODO: Make this return multiple floors and sort by height. Currently
-// this requires floor faces to be sent in from highest to lowest, which with angles
-// won't always be possible in a good way
 export function findFloorHeightAtPosition(floorFaces: Face[], position: EnhancedDOMPoint)
   : { height: number, floor: Face } | undefined {
   let height: number;
@@ -95,4 +92,37 @@ export function findWallCollisionsFromList(walls: Face[], position: EnhancedDOMP
     collisionData.numberOfWallsHit++;
   }
   return collisionData;
+}
+
+
+export function findCeilingFromList(ceilings: Face[], position: EnhancedDOMPoint, offsetY: number):
+  { height: number, ceiling: Face } | undefined {
+  let height: number;
+
+  // Stay in this loop until out of ceilings.
+  for (const ceiling of ceilings) {
+    const { x: x1, z: z1 } = ceiling.points[0];
+    const { x: x2, z: z2 } = ceiling.points[1];
+    const { x: x3, z: z3 } = ceiling.points[2];
+
+    // Checking if point is in bounds of the triangle laterally.
+    if ((z1 - position.z) * (x2 - x1) - (x1 - position.x) * (z2 - z1) > 0) {
+      continue;
+    }
+
+    if ((z2 - position.z) * (x3 - x2) - (x2 - position.x) * (z3 - z2) > 0) {
+      continue;
+    }
+    if ((z3 - position.z) * (x1 - x3) - (x3 - position.x) * (z1 - z3) > 0) {
+      continue;
+    }
+
+      // Find the ceil height at the specific point.
+      height = -(position.x * ceiling.normal.x + ceiling.normal.z * position.z + ceiling.originOffset) / ceiling.normal.y;
+
+    return {
+      height,
+      ceiling,
+    }
+  }
 }

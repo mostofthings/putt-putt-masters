@@ -30,12 +30,12 @@ export function getLevel4() {
 
   const platform = createRegularGrass(5, 5);
   const movingPlatform = new MovingMesh(platform.geometry as MoldableCubeGeometry, platform.material, new EnhancedDOMPoint(0,0,.1), 10);
-  const movingSpikes = createSpikedGround(2.5, 2.5)
-  movingSpikes.scale.set(2, 1, 2);
+  // const movingSpikes = createSpikedGround(2.5, 2.5)
+  // movingSpikes.scale.set(1.9, 1, 1.9);
   // movingSpikes.rotate(degreesToRads(180), 0, 0);
-  movingSpikes.position.set(0, 1, 0);
-  movingPlatform.add(movingSpikes);
-  movingPlatform.position.set(3, 2, -15);
+  // movingSpikes.position.set(0, -1, 0);
+  // movingPlatform.add(movingSpikes);
+  movingPlatform.position.set(3, 3, -15);
 
 
   const staticMeshesToCollide = [mine, ground, ...spikes];
@@ -49,7 +49,10 @@ export function getLevel4() {
     cameraPosition,
     [...staticMeshesToCollide, movingPlatform, ...enemies],
     staticMeshesToCollide,
-    [movingPlatform, movingSpikes],
+    [
+      movingPlatform,
+      // movingSpikes,
+    ],
     enemies
   )
 }

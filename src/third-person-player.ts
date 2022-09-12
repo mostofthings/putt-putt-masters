@@ -18,9 +18,9 @@ export class ThirdPersonPlayer implements CollisionCylinder {
   isDead = false;
   canJumpAgain = true;
   feetCenter = new EnhancedDOMPoint(0, 0, 0);
-  collisionOffsetY = .4;
+  offsetY = .4;
   collisionRadius = .5;
-  height = 1;
+  height = 1.4;
   respawnPoint = new EnhancedDOMPoint(0,0,0);
   respawnCameraPosition = new EnhancedDOMPoint(0,0,0);
 

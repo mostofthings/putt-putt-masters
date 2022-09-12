@@ -10,7 +10,11 @@ import { menuState } from '@/game-states/menu-state';
 import {isPlayer, ThirdPersonPlayer} from '@/third-person-player';
 import {Level} from "@/game-states/levels/level";
 import {LevelCallback} from "@/game-states/levels/level-callback";
-import {findFloorHeightAtPosition, findWallCollisionsFromList} from "@/engine/physics/surface-collision";
+import {
+  findCeilingFromList,
+  findFloorHeightAtPosition,
+  findWallCollisionsFromList
+} from "@/engine/physics/surface-collision";
 import {GroupedFaces} from "@/engine/grouped-faces";
 import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 import {areCylindersColliding} from "@/engine/math-helpers";
@@ -20,6 +24,7 @@ import {scores} from "@/engine/scores";
 import {levelTransitionState} from "@/game-states/level-transition-state";
 import {Enemy, isEnemy} from "@/modeling/enemy";
 import {MovingMesh} from "@/modeling/MovingMesh";
+import {CollisionCylinder} from "@/modeling/collision-cylinder";
 
 const debugElement = document.querySelector('#debug')!;
 
@@ -62,12 +67,7 @@ class GameState implements State {
 
     this.player.update();
     // player collision call
-    const collisionDepth = this.collideWithLevel(
-      this.level.groupedFaces,
-      this.player.feetCenter,
-      this.player.collisionOffsetY,
-      this.player.collisionRadius
-    )
+    const collisionDepth = this.collideWithLevel(this.level.groupedFaces, this.player)
     this.player.updatePositionFromCollision(collisionDepth)
 
     // remove dead enemies
@@ -103,13 +103,21 @@ class GameState implements State {
 
   collideWithLevel(
     groupedFaces: GroupedFaces,
-    feetCenter: EnhancedDOMPoint,
-    offsetY: number,
-    radius: number,
+    collisionCylinder: CollisionCylinder & { velocity?: EnhancedDOMPoint },
     ): number | undefined {
-    const wallCollisions = findWallCollisionsFromList(groupedFaces.wallFaces, feetCenter, offsetY, radius);
+    const { feetCenter, height, collisionRadius } = collisionCylinder;
+    const wallCollisions = findWallCollisionsFromList(groupedFaces.wallFaces, feetCenter, height, collisionRadius);
     feetCenter.x += wallCollisions.xPush;
     feetCenter.z += wallCollisions.zPush;
+
+    const ceilingAtPoint = findCeilingFromList(groupedFaces.ceilingFaces, feetCenter, height)
+    if (ceilingAtPoint && feetCenter.y + .1 < ceilingAtPoint.height && feetCenter.y + height > ceilingAtPoint.height) {
+      const ceilingCollisionDepth = feetCenter.y + height - ceilingAtPoint.height
+      // feetCenter.y -= ceilingCollisionDepth;
+      if (collisionCylinder.velocity) {
+        collisionCylinder.velocity.y = 0;
+      }
+    }
 
     const floorData = findFloorHeightAtPosition(groupedFaces!.floorFaces, feetCenter);
 
