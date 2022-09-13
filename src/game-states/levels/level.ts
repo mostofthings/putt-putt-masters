@@ -47,7 +47,7 @@ export class Level {
     this.hole = new Hole(holePosition)
     const holePlatformAndBodies = [this.hole, createStartPlatform(respawnPoint)]
 
-    doTimes(50, (index) => {
+    doTimes(35, (index) => {
       const {body, bodyCollision} = createDeadBody();
       body.position.set(1000, 0, 0);
       bodyCollision.position.set(1000, 0, 0);
@@ -58,7 +58,6 @@ export class Level {
 
 
     this.staticMeshesToCollide = [...meshesToCollide, ...holePlatformAndBodies, ...this.deadBodyCollisionMeshes] as Mesh[];
-    /// TODO: this may be unnecessary
     this.staticMeshesToCollide.forEach(mesh => mesh.updateWorldMatrix());
 
     this.updateAllGroupedFaces();

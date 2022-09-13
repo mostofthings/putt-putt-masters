@@ -30,7 +30,7 @@ export function getLevel4() {
 
   doTimes(3, (index) =>{
     const geometry = new MoldableCubeGeometry(5, 2, 5);
-    const vector = new EnhancedDOMPoint(0,0, .3);
+    const vector = new EnhancedDOMPoint(0,0, .25);
     const spikes = createSpikedGround(2.5, 2.5) as Mesh;
     movingPlatforms.push(new MovingMesh(geometry, materials.grass, vector,  12))
     movingSpikes.push(new MovingMesh(spikes.geometry as MoldableCubeGeometry, spikes.material, vector, 12));
@@ -46,7 +46,7 @@ export function getLevel4() {
   movingPlatforms[0].position.set(-3.5, 3,  -15);
   movingSpikes[0].position.set(-3.5, 2, -15);
 
-  const oppositeDirectionVector = new EnhancedDOMPoint(0,0,-.3);
+  const oppositeDirectionVector = new EnhancedDOMPoint(0,0,-.25);
   movingPlatforms[1].movementVector = oppositeDirectionVector;
   movingSpikes[1].movementVector = oppositeDirectionVector;
   movingPlatforms[1].position.set(3.5, 3,  6);

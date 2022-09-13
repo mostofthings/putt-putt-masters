@@ -18,24 +18,30 @@ export function createSpikedGround(width: number, length: number): Mesh {
     true,
   );
 
-  const spikes: Mesh[] = [];
+  const spikes: MoldableCubeGeometry[] = [];
   const startWidth = width / 2 * -1;
   const startLength = length / 2 * -1;
 
   doTimes(numberOfSpikesX, (widthIndex) => {
     doTimes(numberOfSpikesY, (lengthIndex) => {
       // spike geometry should be merged into one Mesh
-      const newSpike = new Mesh(createSpike(spikeWidth / 2, spikeBaseSize), new Material({color: '#666'}));
-      newSpike.position.set(
+      const newSpike = createSpike(spikeWidth / 2, spikeBaseSize);
+      newSpike.translate(
         (spikeWidth / 2) + widthIndex * spikeWidth + startWidth,
         spikeBaseSize / 2,
         (spikeLength / 2) + lengthIndex * spikeLength + startLength,
         )
-      newSpike.isDeadly = true;
       spikes.push(newSpike)
     })
   })
-  spikeBase.add(...spikes);
+
+  const mergedSpikes = spikes.reduce((prev, current) => {
+    return prev.merge(current).done();
+  });
+
+  const spikeMesh = new Mesh(mergedSpikes, new Material({color: '#666'}))
+
+  spikeBase.add(spikeMesh);
   return spikeBase;
 }
 

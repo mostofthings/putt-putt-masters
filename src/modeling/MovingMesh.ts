@@ -34,7 +34,6 @@ export class MovingMesh extends Mesh {
       this.distanceTraveled -= this.movementVector.magnitude;
       this.otherMeshesToMove.forEach(mesh => mesh.position.subtract(this.movementVector));
     }
-    this.updateWorldMatrix();
   }
 }
 
