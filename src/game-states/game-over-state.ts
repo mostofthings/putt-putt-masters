@@ -30,7 +30,7 @@ class GameOverState implements State {
     this.camera.position = new EnhancedDOMPoint(0, 0, -17);
     const previousHighScore = scores.highScore;
     const { score } = scores.scoreOverPar;
-    if (score <= previousHighScore.score) {
+    if (!previousHighScore || score <= previousHighScore.score) {
       this.newHighScore = true;
       scores.highScore = {score};
     }
