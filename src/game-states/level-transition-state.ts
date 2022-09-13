@@ -16,8 +16,8 @@ class LevelTransitionState implements State {
   levels: LevelCallback[] = [
     // getLevel1,
     // getLevel2,
-    // getLevel3,
-    // getLevel4,
+    getLevel3,
+    getLevel4,
     // getLevel5,
     getLevel6,
   ];

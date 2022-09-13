@@ -9,6 +9,7 @@ import {MovingMesh} from "@/modeling/MovingMesh";
 import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 import {degreesToRads} from "@/engine/math-helpers";
 import {Material} from "@/engine/renderer/material";
+import {materials} from "@/texture-maker";
 
 // par 2
 export function getLevel6() {
@@ -22,7 +23,6 @@ export function getLevel6() {
   platforms[1].position.set(-4, 2, -3);
   platforms[2].position.set(4, 2, -3);
 
-  const material = new Material({color: '#092'});
 
   const movingPlatforms: MovingMesh[] = [];
   const movingSpikes: MovingMesh[] = [];
@@ -31,7 +31,7 @@ export function getLevel6() {
     const geometry = new MoldableCubeGeometry(5, 2, 5);
     const vector = new EnhancedDOMPoint(0,-.3, 0);
     const spikes = createSpikedGround(2.5, 2.5) as Mesh;
-    movingPlatforms.push(new MovingMesh(geometry, material, vector,  7))
+    movingPlatforms.push(new MovingMesh(geometry, materials.grass, vector,  7))
     movingSpikes.push(new MovingMesh(spikes.geometry as MoldableCubeGeometry, spikes.material, vector, 7));
     movingSpikes[index].add(...spikes.children);
     movingSpikes[index].isDeadly = true;

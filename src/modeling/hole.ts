@@ -4,6 +4,7 @@ import {Material} from "@/engine/renderer/material";
 import {EnhancedDOMPoint, VectorLike} from "@/engine/enhanced-dom-point";
 import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 import {CollisionCylinder} from "@/modeling/collision-cylinder";
+import {materials} from "@/texture-maker";
 
 export class Hole extends Mesh implements CollisionCylinder {
   feetCenter = new EnhancedDOMPoint()
@@ -18,7 +19,7 @@ export class Hole extends Mesh implements CollisionCylinder {
       .computeNormalsPerPlane()
       .done();
 
-    super(geometry, new Material({color: '#092'}));
+    super(geometry, materials.grass);
     this.position.set(position);
     this.feetCenter.set(position);
     // hole has height of 2

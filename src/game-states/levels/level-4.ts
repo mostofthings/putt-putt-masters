@@ -11,6 +11,7 @@ import {degreesToRads} from "@/engine/math-helpers";
 import {Mesh} from "@/engine/renderer/mesh";
 import {Material} from "@/engine/renderer/material";
 import {doTimes} from "@/engine/helpers";
+import {materials} from "@/texture-maker";
 
 // par 5
 export function getLevel4() {
@@ -26,13 +27,12 @@ export function getLevel4() {
 
   const movingPlatforms: MovingMesh[] = [];
   const movingSpikes: MovingMesh[] = [];
-  const material = new Material({color: '#092'});
 
   doTimes(3, (index) =>{
     const geometry = new MoldableCubeGeometry(5, 2, 5);
     const vector = new EnhancedDOMPoint(0,0, .3);
     const spikes = createSpikedGround(2.5, 2.5) as Mesh;
-    movingPlatforms.push(new MovingMesh(geometry, material, vector,  12))
+    movingPlatforms.push(new MovingMesh(geometry, materials.grass, vector,  12))
     movingSpikes.push(new MovingMesh(spikes.geometry as MoldableCubeGeometry, spikes.material, vector, 12));
     movingSpikes[index].add(...spikes.children);
     movingSpikes[index].isDeadly = true;
