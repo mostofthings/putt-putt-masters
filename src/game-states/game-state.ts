@@ -22,12 +22,10 @@ import {drawEngine} from "@/core/draw-engine";
 import {pars} from "@/game-states/levels/pars";
 import {scores} from "@/engine/scores";
 import {levelTransitionState} from "@/game-states/level-transition-state";
-import {Enemy, isEnemy} from "@/modeling/enemy";
+import {Enemy} from "@/modeling/enemy";
 import {MovingMesh} from "@/modeling/MovingMesh";
 import {CollisionCylinder} from "@/modeling/collision-cylinder";
 import {Mesh} from "@/engine/renderer/mesh";
-
-const debugElement = document.querySelector('#debug')!;
 
 class GameState implements State {
   player: ThirdPersonPlayer;
@@ -47,8 +45,11 @@ class GameState implements State {
     this.player.respawnCameraPosition.set(this.level.cameraPosition);
     this.player.respawnPoint.set(this.level.respawnPoint);
     scores.setLevelScore(this.levelNumber, 1);
+    this.player.isCameraFollowing = false;
 
     this.player.respawn();
+
+    window.setTimeout(() => this.player.isCameraFollowing = true, 4000);
 
     this.level.scene.skybox = new Skybox(...skyboxes.dayCloud);
     this.level.scene.skybox.bindGeometry();
@@ -69,16 +70,25 @@ class GameState implements State {
     this.removeStaleEnemiesFromScene();
 
     // update remaining enemies
-    this.level.enemies.forEach(enemy => enemy.update());
+    this.level.enemies.forEach(enemy => {
+      if (enemy && typeof enemy.update === 'function') {
+        enemy.update();
+      }
+    });
 
     // check player for collide with enemies; call onCollide
     this.collideWithEnemies(this.player, this.level.enemies)
 
     // check enemies for collide with each other and the player;
-    this.level.enemies.forEach(enemy => this.collideWithEnemies(enemy, [...this.level.enemies, this.player]));
+    // this.level.enemies.forEach(enemy => this.collideWithEnemies(enemy, [...this.level.enemies, this.player]));
 
     if (areCylindersColliding(this.level.hole, this.player)) {
+      this.player.velocity.set(0,0,0);
       getGameStateMachine().setState(levelTransitionState, this.levelNumber + 1)
+    }
+
+    if (!this.player.isCameraFollowing) {
+      this.camera.lookAt(this.level.hole.position);
     }
 
     if (this.player.feetCenter.y < -30 ) {
@@ -157,7 +167,7 @@ class GameState implements State {
   }
 
 
-  collideWithEnemies(toCollide: ThirdPersonPlayer | Enemy, enemies: (Enemy | ThirdPersonPlayer)[]) {
+  collideWithEnemies(toCollide: ThirdPersonPlayer, enemies: (Enemy)[]) {
     for (const enemy of enemies) {
       // can't collide with itself
       if (toCollide.feetCenter === enemy.feetCenter) {
@@ -168,13 +178,14 @@ class GameState implements State {
         continue;
       }
 
-      if (isPlayer(toCollide)) {
-        if (isEnemy(enemy) && enemy.isDeadly) {
+        if (enemy.isDeadly) {
           this.killPlayer();
         }
-      } else {
-        toCollide.onCollide();
-      }
+
+
+        if (typeof enemy.onCollide === 'function') {
+          enemy.onCollide();
+        }
     }
   }
 
@@ -186,16 +197,23 @@ class GameState implements State {
 
     if (shouldShowDeadBody){
       const bodyToMove = this.level.deadBodies[scores.getLevelScore(this.levelNumber) - 1];
-      bodyToMove.position.set(this.player.feetCenter)
+      const collisionMeshToMove = this.level.deadBodyCollisionMeshes[scores.getLevelScore(this.levelNumber) - 1];
+      bodyToMove.position.set(this.player.feetCenter);
+      collisionMeshToMove.position.set(this.player.feetCenter);
+      collisionMeshToMove.updateWorldMatrix();
       const floorFace = findFloorHeightAtPosition(this.level.groupedFaces.floorFaces, this.player.feetCenter);
       if (floorFace && isFloorDeath) {
         bodyToMove.position.y = floorFace.height + .7;
+        collisionMeshToMove.position.y = floorFace.height + .7;
         this.level.dynamicMeshesToCollide.push(bodyToMove);
+        this.level.deadBodyCollisionMeshes.push(collisionMeshToMove);
       } else {
         bodyToMove.position.y += .7;
+        collisionMeshToMove.position.y += .7;
       }
       if (parentMesh) {
         parentMesh.otherMeshesToMove.push(bodyToMove);
+        parentMesh.otherMeshesToMove.push(collisionMeshToMove);
         parentMesh.movementVector.x -= parentMesh.movementVector.x * .4
         parentMesh.movementVector.y -= parentMesh.movementVector.y * .4
         parentMesh.movementVector.z -= parentMesh.movementVector.z * .4

@@ -22,7 +22,7 @@ export class GolfBallMan extends Mesh {
   }
 }
 
-export function createDeadBody(): Mesh {
+export function createDeadBody(): { body: Mesh, bodyCollision: Mesh }  {
   const body = new Mesh(createGolfBallBody(), new Material({ color: '#fff'}));
   const arm = createArm(.4, .2);
   const arm2 = createArm(-.2, .2);
@@ -31,7 +31,8 @@ export function createDeadBody(): Mesh {
   body.add(face);
   body.setRotation(getRandomArbitrary(0,1), 2, getRandomArbitrary(0.5,1));
   body.position.set(0,1,0);
-  return body;
+  const bodyCollision = new Mesh(new MoldableCubeGeometry(1.5,1.75,1.5), new Material({ color: '#fff'}))
+  return { body, bodyCollision };
 }
 
 function createGolfBallBody() {

@@ -12,7 +12,7 @@ import {Enemy} from "@/modeling/enemy";
 export function getLevel2() {
   const holePosition = new EnhancedDOMPoint(0,-.5,12);
   const respawnPoint = new EnhancedDOMPoint(0, -1, 0);
-  const cameraPosition = new EnhancedDOMPoint(0,5,-20);
+  const cameraPosition = new EnhancedDOMPoint(0,5,20);
 
   const platforms = [createRegularGrass(10, 10), createRegularGrass(7, 12)];
 
@@ -42,7 +42,7 @@ export function getLevel2() {
 
   const enemies = mines.flatMap(mine => [mine, mine.explosion]);
 
-  const staticMeshesToCollide = [...platforms, ...spikes, ...mines];
+  const staticMeshesToCollide = [...platforms, ...spikes];
 
   return new Level(
     2,

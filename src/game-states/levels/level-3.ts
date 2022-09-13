@@ -10,7 +10,7 @@ import {ProximityMine} from "@/modeling/proximity-mine";
 export function getLevel3() {
   const holePosition = new EnhancedDOMPoint(0,16,20);
   const respawnPoint = new EnhancedDOMPoint(0, 0, -25);
-  const cameraPosition = new EnhancedDOMPoint(0,5,-30);
+  const cameraPosition = new EnhancedDOMPoint(0,20,25);
 
   const platforms = [createRegularGrass(40, 50)];
 
@@ -58,7 +58,7 @@ export function getLevel3() {
 
 
 
-  const staticMeshesToCollide = [...platforms, ...spikes, mine];
+  const staticMeshesToCollide = [...platforms, ...spikes];
 
   return new Level(
     3,

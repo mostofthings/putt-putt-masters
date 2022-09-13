@@ -6,6 +6,7 @@ import {degreesToRads} from "@/engine/math-helpers";
 import {createSpike} from "@/modeling/spike";
 import {Enemy} from "@/modeling/enemy";
 import {EnhancedDOMPoint, VectorLike} from "@/engine/enhanced-dom-point";
+import {explosionTexture} from "@/texture-maker";
 
 export class ProximityMine extends Enemy {
   explosion: Enemy;
@@ -24,10 +25,8 @@ export class ProximityMine extends Enemy {
     })
     bodyGeometry.done();
 
-    const update = () => this.updateExplosion()
-    const onCollide = () => { this.explosion.isDeadly = true; }
 
-    super(feetCenter, 2, 1, bodyGeometry, new Material({color: '#666'}), update, onCollide);
+    super(feetCenter, 2, 1, bodyGeometry, new Material({color: '#666'}));
 
     const explosionGeometry = new MoldableCubeGeometry(5,5,5,5,5,5)
       .spherify(2.5)
@@ -35,8 +34,9 @@ export class ProximityMine extends Enemy {
       .computeNormalsCrossPlane()
       .done();
 
+
     // explosion has same feetCenter as otherwise the mine blows itself up
-    this.explosion = new Enemy(feetCenter, .25, .25, explosionGeometry, new Material({ color: 'red', isTransparent: true }))
+    this.explosion = new Enemy(feetCenter, .25, .25, explosionGeometry, new Material({ texture: explosionTexture, isTransparent: true, emissive: '#fff' }))
   }
 
   updateExplosion() {
@@ -55,5 +55,15 @@ export class ProximityMine extends Enemy {
       this.shouldBeRemovedFromScene = true;
       this.explosion.shouldBeRemovedFromScene = true;
     }
+  }
+
+  // @ts-ignore
+  update() {
+    this.updateExplosion();
+  }
+
+  // @ts-ignore
+  onCollide() {
+    this.explosion.isDeadly = true;
   }
 }
