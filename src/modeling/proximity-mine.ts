@@ -6,6 +6,7 @@ import {degreesToRads} from "@/engine/math-helpers";
 import {createSpike} from "@/modeling/spike";
 import {Enemy} from "@/modeling/enemy";
 import {EnhancedDOMPoint, VectorLike} from "@/engine/enhanced-dom-point";
+import {explosionTexture} from "@/texture-maker";
 
 export class ProximityMine extends Enemy {
   explosion: Enemy;
@@ -36,7 +37,7 @@ export class ProximityMine extends Enemy {
       .done();
 
     // explosion has same feetCenter as otherwise the mine blows itself up
-    this.explosion = new Enemy(feetCenter, .25, .25, explosionGeometry, new Material({ color: 'red', isTransparent: true }))
+    this.explosion = new Enemy(feetCenter, .25, .25, explosionGeometry, new Material({ texture: explosionTexture, isTransparent: true, emissive: '#fff' }))
   }
 
   updateExplosion() {

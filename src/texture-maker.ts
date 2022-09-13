@@ -26,6 +26,17 @@ export function drawGrass() {
   drawContext.globalCompositeOperation = 'source-over';
   return mainImageData();
 }
+export function drawExplosion() {
+  clearWith('rgba(255,12,12,0.7)');
+  noiseMaker.seed(5);
+  noiseContext.putImageData(noiseMaker.noiseImage(128, 1 / 32, 3, NoiseType.Perlin, 'rgba(255,128,0,0.56)', 128), 0, 0);
+  drawContext.drawImage(noiseContext.canvas, 0, 0, resolution, resolution);
+  drawContext.globalCompositeOperation = 'source-over';
+  return mainImageData();
+}
+export const explosionTexture = textureLoader.load(drawExplosion());
+explosionTexture.repeat.x = 1/10; explosionTexture.repeat.y = 1/10;
+
 const floorTexture = textureLoader.load(drawGrass());
 floorTexture.repeat.x = 1/10; floorTexture.repeat.y = 1/10;
 const grass = new Material({texture: floorTexture});

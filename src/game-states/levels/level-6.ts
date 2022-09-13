@@ -15,7 +15,7 @@ import {materials} from "@/texture-maker";
 export function getLevel6() {
   const holePosition = new EnhancedDOMPoint(0,0,15);
   const respawnPoint = new EnhancedDOMPoint(0, -1, -20);
-  const cameraPosition = new EnhancedDOMPoint(0,10,-25);
+  const cameraPosition = new EnhancedDOMPoint(0,3,20);
 
   const platforms = [createRegularGrass(10, 45)];
   platforms[0].position.set(0, -2, 0)

@@ -16,6 +16,7 @@ export class ThirdPersonPlayer implements CollisionCylinder {
   isJumping = false;
   isDead = false;
   canJumpAgain = true;
+  isCameraFollowing = false;
   feetCenter = new EnhancedDOMPoint(0, 0, 0);
   offsetY = .4;
   collisionRadius = .5;
@@ -30,7 +31,7 @@ export class ThirdPersonPlayer implements CollisionCylinder {
 
   mesh: GolfBallMan;
   camera: Camera;
-  idealPosition = new EnhancedDOMPoint(0, 3, -8);
+  idealPosition = new EnhancedDOMPoint(0, 4.5, -8); // where should camera be
   idealLookAt = new EnhancedDOMPoint(0, 2, 0);
 
 
@@ -48,7 +49,7 @@ export class ThirdPersonPlayer implements CollisionCylinder {
   }
 
   update() {
-    if (!this.isDead) {
+    if (!this.isDead && this.isCameraFollowing) {
       this.updateVelocityFromControls();
       this.moveAppendages();
     } if (this.isDead) {
@@ -62,20 +63,23 @@ export class ThirdPersonPlayer implements CollisionCylinder {
     this.mesh.position.y += 1.25; // move up by half height so mesh ends at feet position
 
 
-    this.camera.position.lerp(this.transformIdeal(this.idealPosition), 0.01);
+    this.camera.position.lerp(this.transformIdeal(this.idealPosition), 0.025);
 
-    // Keep camera away regardless of lerp
-    const distanceToKeep = 17;
-    const {x, z} = this.camera.position.clone()
-      .subtract(this.mesh.position) // distance from camera to player
-      .normalize() // direction of camera to player
-      .scale(distanceToKeep) // scale direction out by distance, giving us a lerp direction but constant distance
-      .add(this.mesh.position); // move back relative to player
+    if (this.isCameraFollowing) {
+      // Keep camera away regardless of lerp
+      const distanceToKeep = 13; // distance of camera behind you
+      const {x, z} = this.camera.position.clone()
+        .subtract(this.mesh.position) // distance from camera to player
+        .normalize() // direction of camera to player
+        .scale(distanceToKeep) // scale direction out by distance, giving us a lerp direction but constant distance
+        .add(this.mesh.position); // move back relative to player
 
-    this.camera.position.x = x;
-    this.camera.position.z = z;
+      this.camera.position.x = x;
+      this.camera.position.z = z;
 
-    this.camera.lookAt(this.transformIdeal(this.idealLookAt));
+      this.camera.lookAt(this.transformIdeal(this.idealLookAt));
+    }
+
     this.camera.updateWorldMatrix();
   }
 

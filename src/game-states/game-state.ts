@@ -47,8 +47,11 @@ class GameState implements State {
     this.player.respawnCameraPosition.set(this.level.cameraPosition);
     this.player.respawnPoint.set(this.level.respawnPoint);
     scores.setLevelScore(this.levelNumber, 1);
+    this.player.isCameraFollowing = false;
 
     this.player.respawn();
+
+    window.setTimeout(() => this.player.isCameraFollowing = true, 4000);
 
     this.level.scene.skybox = new Skybox(...skyboxes.dayCloud);
     this.level.scene.skybox.bindGeometry();
@@ -78,7 +81,12 @@ class GameState implements State {
     this.level.enemies.forEach(enemy => this.collideWithEnemies(enemy, [...this.level.enemies, this.player]));
 
     if (areCylindersColliding(this.level.hole, this.player)) {
+      this.player.velocity.set(0,0,0);
       getGameStateMachine().setState(levelTransitionState, this.levelNumber + 1)
+    }
+
+    if (!this.player.isCameraFollowing) {
+      this.camera.lookAt(this.level.hole.position);
     }
 
     if (this.player.feetCenter.y < -30 ) {
@@ -186,16 +194,23 @@ class GameState implements State {
 
     if (shouldShowDeadBody){
       const bodyToMove = this.level.deadBodies[scores.getLevelScore(this.levelNumber) - 1];
-      bodyToMove.position.set(this.player.feetCenter)
+      const collisionMeshToMove = this.level.deadBodyCollisionMeshes[scores.getLevelScore(this.levelNumber) - 1];
+      bodyToMove.position.set(this.player.feetCenter);
+      collisionMeshToMove.position.set(this.player.feetCenter);
+      collisionMeshToMove.updateWorldMatrix();
       const floorFace = findFloorHeightAtPosition(this.level.groupedFaces.floorFaces, this.player.feetCenter);
       if (floorFace && isFloorDeath) {
         bodyToMove.position.y = floorFace.height + .7;
+        collisionMeshToMove.position.y = floorFace.height + .7;
         this.level.dynamicMeshesToCollide.push(bodyToMove);
+        this.level.deadBodyCollisionMeshes.push(collisionMeshToMove);
       } else {
         bodyToMove.position.y += .7;
+        collisionMeshToMove.position.y += .7;
       }
       if (parentMesh) {
         parentMesh.otherMeshesToMove.push(bodyToMove);
+        parentMesh.otherMeshesToMove.push(collisionMeshToMove);
         parentMesh.movementVector.x -= parentMesh.movementVector.x * .4
         parentMesh.movementVector.y -= parentMesh.movementVector.y * .4
         parentMesh.movementVector.z -= parentMesh.movementVector.z * .4

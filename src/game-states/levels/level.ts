@@ -18,6 +18,7 @@ export class Level {
   cameraPosition: EnhancedDOMPoint;
   scene: Scene = new Scene();
   deadBodies: Mesh[] = [];
+  deadBodyCollisionMeshes: Mesh[] = [];
   enemies: Enemy[];
   meshesToRender: Mesh[];
   staticMeshesToCollide: Mesh[];
@@ -44,21 +45,24 @@ export class Level {
     this.enemies = enemies;
 
     this.hole = new Hole(holePosition)
-    const holeAndStartPlatform = [this.hole, createStartPlatform(respawnPoint)]
+    const holePlatformAndBodies = [this.hole, createStartPlatform(respawnPoint)]
 
     doTimes(50, (index) => {
-      const body = createDeadBody();
-      body.position.set(1000, 0, 0)
-      holeAndStartPlatform.push(body);
+      const {body, bodyCollision} = createDeadBody();
+      body.position.set(1000, 0, 0);
+      bodyCollision.position.set(1000, 0, 0);
       this.deadBodies.push(body)
+      this.deadBodyCollisionMeshes.push(bodyCollision);
+      body.updateWorldMatrix();
     });
 
-    this.staticMeshesToCollide = [...meshesToCollide, ...holeAndStartPlatform, ...this.deadBodies] as Mesh[];
+
+    this.staticMeshesToCollide = [...meshesToCollide, ...holePlatformAndBodies, ...this.deadBodyCollisionMeshes] as Mesh[];
     /// TODO: this may be unnecessary
     this.staticMeshesToCollide.forEach(mesh => mesh.updateWorldMatrix());
 
     this.updateAllGroupedFaces();
-    this.meshesToRender = [...meshesToRender, ...holeAndStartPlatform];
+    this.meshesToRender = [...meshesToRender, ...holePlatformAndBodies, ...this.deadBodies];
     this.scene.add(...this.meshesToRender);
   }
 
