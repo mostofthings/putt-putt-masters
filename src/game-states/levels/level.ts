@@ -53,7 +53,7 @@ export class Level {
       this.deadBodies.push(body)
     });
 
-    this.staticMeshesToCollide = [...meshesToCollide, ...holeAndStartPlatform] as Mesh[];
+    this.staticMeshesToCollide = [...meshesToCollide, ...holeAndStartPlatform, ...this.deadBodies] as Mesh[];
     /// TODO: this may be unnecessary
     this.staticMeshesToCollide.forEach(mesh => mesh.updateWorldMatrix());
 

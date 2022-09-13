@@ -7,6 +7,7 @@ class Controls {
   isRight = false;
   isEnter = false;
   isEscape = false;
+  isM = false;
   direction: EnhancedDOMPoint;
   isJumpPressed = false;
   private mouseMovement = new EnhancedDOMPoint();
@@ -78,6 +79,10 @@ class Controls {
         break;
       case 'Escape':
         this.isEscape = isPressed;
+        break;
+      case 'KeyM':
+        this.isM = isPressed;
+        break;
     }
     this.direction.x = (Number(this.isLeft) * -1) + Number(this.isRight);
     this.direction.z = (Number(this.isUp) * -1) + Number(this.isDown);

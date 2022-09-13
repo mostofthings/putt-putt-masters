@@ -5,7 +5,6 @@ import { controls } from '@/core/controls';
 import { Mesh } from '@/engine/renderer/mesh';
 import { textureLoader } from '@/engine/renderer/texture-loader';
 import { drawVolcanicRock } from '@/texture-maker';
-import { audioCtx } from '@/engine/audio/audio-player';
 import {GolfBallMan} from "@/modeling/golf-ball-man";
 import {clamp, moveValueTowardsTarget} from "@/engine/helpers";
 import {CollisionCylinder} from "@/modeling/collision-cylinder";
@@ -18,9 +17,9 @@ export class ThirdPersonPlayer implements CollisionCylinder {
   isDead = false;
   canJumpAgain = true;
   feetCenter = new EnhancedDOMPoint(0, 0, 0);
-  collisionOffsetY = .4;
+  offsetY = .4;
   collisionRadius = .5;
-  height = 1;
+  height = 1.4;
   respawnPoint = new EnhancedDOMPoint(0,0,0);
   respawnCameraPosition = new EnhancedDOMPoint(0,0,0);
 
@@ -34,15 +33,12 @@ export class ThirdPersonPlayer implements CollisionCylinder {
   idealPosition = new EnhancedDOMPoint(0, 3, -8);
   idealLookAt = new EnhancedDOMPoint(0, 2, 0);
 
-  listener: AudioListener;
-
 
   constructor(camera: Camera) {
     textureLoader.load(drawVolcanicRock())
     this.mesh = new GolfBallMan();
     this.feetCenter.y = 10;
     this.camera = camera;
-    this.listener = audioCtx.listener;
   }
 
   private transformIdeal(ideal: EnhancedDOMPoint): EnhancedDOMPoint {
@@ -81,8 +77,6 @@ export class ThirdPersonPlayer implements CollisionCylinder {
 
     this.camera.lookAt(this.transformIdeal(this.idealLookAt));
     this.camera.updateWorldMatrix();
-
-    this.updateAudio()
   }
 
   protected updateVelocityFromControls() {
@@ -128,20 +122,6 @@ export class ThirdPersonPlayer implements CollisionCylinder {
     } else {
       this.canJumpAgain = false;
     }
-  }
-
-  private updateAudio() {
-    this.listener.positionX.value = this.mesh.position.x;
-    this.listener.positionY.value = this.mesh.position.y;
-    this.listener.positionZ.value = this.mesh.position.z;
-
-    const {x, z} = this.mesh.position.clone()
-      .subtract(this.camera.position) // distance from camera to player
-      .normalize() // direction of camera to player
-
-    this.listener.forwardX.value = x;
-    // this.listener.forwardY.value = cameraDireciton.y;
-    this.listener.forwardZ.value = z;
   }
 
   respawn() {

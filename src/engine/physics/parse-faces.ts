@@ -3,6 +3,7 @@ import { EnhancedDOMPoint } from "@/engine/enhanced-dom-point";
 import { AttributeLocation } from '@/engine/renderer/renderer';
 import { Mesh } from '@/engine/renderer/mesh';
 import {GroupedFaces} from "@/engine/grouped-faces";
+import {isMovingMesh, MovingMesh} from "@/modeling/MovingMesh";
 
 function indexToFaceVertexPoint(index: number, positionData: Float32Array, matrix: DOMMatrix): EnhancedDOMPoint {
   return new EnhancedDOMPoint().set(
@@ -10,7 +11,7 @@ function indexToFaceVertexPoint(index: number, positionData: Float32Array, matri
   )
 }
 
-export function getGroupedFaces(meshes: Mesh[]): GroupedFaces {
+export function getGroupedFaces(meshes: (Mesh |  MovingMesh)[]): GroupedFaces {
   const faces = meshes.flatMap(mesh => {
     const indices = mesh.geometry.getIndices()!; // assuming always having indices
 
@@ -32,7 +33,7 @@ export function getGroupedFaces(meshes: Mesh[]): GroupedFaces {
       ]);
     }
 
-    return triangles.map(triangle => new Face(triangle, undefined, mesh.isDeadly));
+    return triangles.map(triangle => new Face(triangle, undefined, mesh.isDeadly, isMovingMesh(mesh) ? mesh : undefined));
   }).sort((a, b) => a.upperY > b.upperY ? -1 : 1);
 
   const floorFaces: Face[] = [];
