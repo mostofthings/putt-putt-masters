@@ -31,7 +31,7 @@ export function getLevel2() {
   const spikes: Mesh[] = [];
   doTimes(3, () => {spikes.push(createSpikedGround(5, .55)); })
   spikes[0].position.set(8, 1.1, 4)
-  spikes[1].position.set(9, 1.6,10)
+  spikes[1].position.set(10, 1.6,10)
   spikes[2].position.set(8, 1.8, 16)
 
   const mines = [

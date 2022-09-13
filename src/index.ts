@@ -1,25 +1,13 @@
-import { Camera } from './engine/renderer/camera';
-import { Mesh } from './engine/renderer/mesh';
-import { MoldableCubeGeometry } from './engine/moldable-cube-geometry';
-import { Material } from './engine/renderer/material';
-import { getGroupedFaces } from './engine/physics/parse-faces';
-import { PlaneGeometry } from './engine/plane-geometry';
-import { EnhancedDOMPoint } from '@/engine/enhanced-dom-point';
-import { AttributeLocation, Renderer } from "@/engine/renderer/renderer";
 import {
-  drawBricks,
   drawCurrentTexture,
-  drawGrass,
-  drawLandscape,
-  drawMarble, drawParticle, drawSky,
-  drawStoneWalkway, drawVolcanicRock, drawWater
 } from '@/texture-maker';
 import { controls } from '@/core/controls';
 import { createGameStateMachine, getGameStateMachine } from '@/game-state-machine';
-import { gameState } from '@/game-states/game-state';
 import { menuState } from '@/game-states/menu-state';
-import { getLevel1 } from '@/game-states/levels/level-1';
-import { getLevel2 } from '@/game-states/levels/level-2';
+import {gameState} from "@/game-states/game-state";
+import {getLevel4} from "@/game-states/levels/level-4";
+import {getLevel2} from "@/game-states/levels/level-2";
+import {getLevel5} from "@/game-states/levels/level-5";
 
 const debugElement = document.querySelector('#debug')!;
 
@@ -27,7 +15,8 @@ const debugElement = document.querySelector('#debug')!;
 drawCurrentTexture();
 // END TESTING
 
-createGameStateMachine(gameState, getLevel1);
+// TODO: remove this
+createGameStateMachine(gameState, getLevel2);
 
 
 let previousTime = 0;
@@ -45,6 +34,7 @@ function draw(currentTime: number) {
     getGameStateMachine().getState().onUpdate(delta);
   }
 
+  // TODO: remove
   debugElement.textContent = delta.toString();
 
   requestAnimationFrame(draw);

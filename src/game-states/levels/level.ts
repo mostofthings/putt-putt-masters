@@ -47,7 +47,7 @@ export class Level {
     this.hole = new Hole(holePosition)
     const holePlatformAndBodies = [this.hole, createStartPlatform(respawnPoint)]
 
-    doTimes(50, (index) => {
+    doTimes(35, (index) => {
       const {body, bodyCollision} = createDeadBody();
       body.position.set(1000, 0, 0);
       bodyCollision.position.set(1000, 0, 0);
