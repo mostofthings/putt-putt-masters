@@ -8,11 +8,11 @@ class Scores {
   }
 
   get scorecard() {
-    return JSON.parse(localStorage.getItem(this.key)!) as Score[];
+    return JSON.parse(window.localStorage.getItem(this.key)!) as Score[];
   }
 
   set scorecard(scorecard) {
-    localStorage.setItem(this.key, JSON.stringify(scorecard));
+    window.localStorage.setItem(this.key, JSON.stringify(scorecard));
   }
 
   resetScores(pars: number[]) {
@@ -89,11 +89,11 @@ class Scores {
   }
 
   get highScore(): { score: number } {
-    return JSON.parse(localStorage.getItem(`${this.key}-hs`)!) as { score: number };
+    return JSON.parse(window.localStorage.getItem(`${this.key}-hs`)!) as { score: number };
   }
 
   set highScore(score: { score: number }) {
-    localStorage.setItem(`${this.key}-hs`, JSON.stringify(score));
+    window.localStorage.setItem(`${this.key}-hs`, JSON.stringify(score));
   }
 
   get scoreMessage() {
