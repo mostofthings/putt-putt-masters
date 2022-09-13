@@ -51,15 +51,19 @@ class Scores {
     })
 
     yOffset += 24
-    const {par, score } = this.scorecard
+    const {par, score } = this.scoreOverPar;
+    drawEngine.drawText(par as unknown as string, 20, xOffsets[1], yOffset + 2)
+    drawEngine.drawText(score as unknown as string, 20, xOffsets[2], yOffset + 2)
+  }
+
+  get scoreOverPar() {
+    return this.scorecard
       .filter(levelScore => levelScore.score !== -1)
       .reduce((previous, current) => {
         previous.par += current.par;
         previous.score += current.score - current.par;
         return previous;
       }, { par: 0, score: 0 })
-    drawEngine.drawText(par as unknown as string, 20, xOffsets[1], yOffset + 2)
-    drawEngine.drawText(score as unknown as string, 20, xOffsets[2], yOffset + 2)
   }
 
   get nextIncompleteHole(): number {
@@ -82,6 +86,18 @@ class Scores {
 
   get isScorecardComplete(): boolean {
     return !this.scorecard.filter(score => score.score === -1).length;
+  }
+
+  get highScore(): { score: number } {
+    return JSON.parse(localStorage.getItem(`${this.key}-hs`)!) as { score: number };
+  }
+
+  set highScore(score: { score: number }) {
+    localStorage.setItem(`${this.key}-hs`, JSON.stringify(score));
+  }
+
+  get scoreMessage() {
+    return `High Score: ${this.highScore.score} ${ this.highScore.score > 0 ? 'over' : 'under'} par`;
   }
 }
 

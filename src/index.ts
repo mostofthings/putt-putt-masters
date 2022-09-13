@@ -35,8 +35,6 @@ draw(0);
 
 function draw(time: number) {
   controls.queryController();
-  // debugElement.textContent = `${1 / ((time - lastTime) / 1000)} fps`;
-  // lastTime = time;
 
   getGameStateMachine().getState().onUpdate(time);
 

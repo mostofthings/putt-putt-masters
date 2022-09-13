@@ -10,6 +10,7 @@ import {scores} from "@/engine/scores";
 class GameOverState implements State {
   scene: Scene;
   camera: Camera;
+  newHighScore = false;
 
   constructor() {
     this.scene = new Scene();
@@ -27,11 +28,20 @@ class GameOverState implements State {
     skybox.bindGeometry();
     this.scene.skybox = skybox;
     this.camera.position = new EnhancedDOMPoint(0, 0, -17);
+    const previousHighScore = scores.highScore;
+    const { score } = scores.scoreOverPar;
+    if (score <= previousHighScore.score) {
+      this.newHighScore = true;
+      scores.highScore = {score};
+    }
   }
 
   onUpdate() {
     drawEngine.clearContext();
     drawEngine.drawText(`Game Over!`, 50, drawEngine.width / 2, 500);
+    if (this.newHighScore) {
+      drawEngine.drawText(`New ${ scores.scoreMessage }`,  25, drawEngine.width / 2, 550);
+    }
     scores.drawScorecard();
   }
 

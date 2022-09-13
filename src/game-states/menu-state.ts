@@ -82,10 +82,14 @@ class MenuState implements State {
 
   drawMenu() {
     const halfWidth = drawEngine.width / 2;
-    drawEngine.drawText('Regular Golf', 85, halfWidth, 300)
+    drawEngine.drawText('Putt Putt Masters', 85, halfWidth, 300)
+    drawEngine.drawText('die to win', 40, halfWidth, 350)
     this.options.forEach((option, index) => {
       drawEngine.drawText(option, 50, halfWidth, (index * 55) + 500, index === this.selectedOptionIndex ? 'blue' : 'white');
     })
+    if (scores.highScore) {
+      drawEngine.drawText(scores.scoreMessage, 25, halfWidth, 700);
+    }
   }
 }
 

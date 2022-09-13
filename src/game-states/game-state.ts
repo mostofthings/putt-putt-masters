@@ -111,10 +111,10 @@ class GameState implements State {
     feetCenter.z += wallCollisions.zPush;
 
     const ceilingAtPoint = findCeilingFromList(groupedFaces.ceilingFaces, feetCenter, height)
-    debugElement.textContent = `${ceilingAtPoint?.ceiling.isDeadly}`
+
     if (ceilingAtPoint && feetCenter.y + (height /2) < ceilingAtPoint.height && feetCenter.y + height > ceilingAtPoint.height) {
       const ceilingCollisionDepth = feetCenter.y + height - ceilingAtPoint.height
-      // feetCenter.y -= ceilingCollisionDepth;
+
       if (collisionCylinder.velocity) {
         collisionCylinder.velocity.y = 0;
       }
@@ -221,6 +221,13 @@ class GameState implements State {
     const halfHeight = drawEngine.height / 2;
 
     drawEngine.clearContext();
+
+    drawEngine.drawText(
+      `Hole ${ this.levelNumber }
+      Par ${ pars[this.levelNumber - 1]}
+      Current Stroke: ${ scores.getLevelScore(this.levelNumber) }
+      -- Press M for Music --`
+      , 25, halfWidth,  30);
 
     if (this.player.isDead) {
       drawEngine.drawText(`You Died`, 40, halfWidth, halfHeight);
