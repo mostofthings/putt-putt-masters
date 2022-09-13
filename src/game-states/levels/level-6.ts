@@ -29,7 +29,7 @@ export function getLevel6() {
 
   doTimes(3, (index) => {
     const geometry = new MoldableCubeGeometry(5, 2, 5);
-    const vector = new EnhancedDOMPoint(0,-.3, 0);
+    const vector = new EnhancedDOMPoint(0,-.28, 0);
     const spikes = createSpikedGround(2.5, 2.5) as Mesh;
     movingPlatforms.push(new MovingMesh(geometry, materials.grass, vector,  7))
     movingSpikes.push(new MovingMesh(spikes.geometry as MoldableCubeGeometry, spikes.material, vector, 7));

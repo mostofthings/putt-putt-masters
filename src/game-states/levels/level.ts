@@ -58,7 +58,6 @@ export class Level {
 
 
     this.staticMeshesToCollide = [...meshesToCollide, ...holePlatformAndBodies, ...this.deadBodyCollisionMeshes] as Mesh[];
-    /// TODO: this may be unnecessary
     this.staticMeshesToCollide.forEach(mesh => mesh.updateWorldMatrix());
 
     this.updateAllGroupedFaces();

@@ -60,7 +60,7 @@ export class ThirdPersonPlayer implements CollisionCylinder {
     this.mesh.position.y += 1.25; // move up by half height so mesh ends at feet position
 
 
-    this.camera.position.lerp(this.transformIdeal(this.idealPosition), 0.016);
+    this.camera.position.lerp(this.transformIdeal(this.idealPosition), 0.017);
 
     if (this.isCameraFollowing) {
       // Keep camera away regardless of lerp
@@ -81,7 +81,7 @@ export class ThirdPersonPlayer implements CollisionCylinder {
   }
 
   protected updateVelocityFromControls() {
-    const speedMultiplier = 0.07;
+    const speedMultiplier = 0.078;
 
     const mag = clamp(controls.direction.magnitude, 0, 1);
     const step = mag > this.speed ? .05 : .03;
@@ -112,7 +112,7 @@ export class ThirdPersonPlayer implements CollisionCylinder {
       this.canJumpAgain = true;
     }
 
-    this.velocity.y -= 0.014; // gravity
+    this.velocity.y -= 0.015; // gravity
   }
 
   updatePositionFromCollision(collisionDepth?: number) {
