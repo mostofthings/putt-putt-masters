@@ -98,6 +98,9 @@ export function findWallCollisionsFromList(walls: Face[], position: EnhancedDOMP
 export function findCeilingFromList(ceilings: Face[], position: EnhancedDOMPoint, offsetY: number):
   { height: number, ceiling: Face } | undefined {
   let height: number;
+  ceilings = ceilings
+    .filter(ceiling => ceiling.upperY > position.y)
+    .sort((a, b) => a.upperY < b.upperY ? -1 : 1);
 
   // Stay in this loop until out of ceilings.
   for (const ceiling of ceilings) {

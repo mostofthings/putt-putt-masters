@@ -7,7 +7,7 @@ import {createSpike} from "@/modeling/spike";
 
 const spikeBaseSize = .5;
 
-export function createSpikedGround(width: number, length: number) {
+export function createSpikedGround(width: number, length: number): Mesh {
   const numberOfSpikesX = getNumberOfSpikesPerDimension(width);
   const numberOfSpikesY = getNumberOfSpikesPerDimension(length);
   const spikeWidth = width / numberOfSpikesX;
@@ -31,6 +31,7 @@ export function createSpikedGround(width: number, length: number) {
         spikeBaseSize / 2,
         (spikeLength / 2) + lengthIndex * spikeLength + startLength,
         )
+      newSpike.isDeadly = true;
       spikes.push(newSpike)
     })
   })

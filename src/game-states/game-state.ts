@@ -1,5 +1,5 @@
 import { State } from '@/core/state';
-import { audioCtx, getAudioPlayer, panner } from '@/engine/audio/audio-player';
+import {toggleMusic} from '@/engine/audio/audio-player';
 import { Skybox } from '@/skybox';
 import { skyboxes,} from '@/texture-maker';
 import { Camera } from '@/engine/renderer/camera';
@@ -25,6 +25,7 @@ import {levelTransitionState} from "@/game-states/level-transition-state";
 import {Enemy, isEnemy} from "@/modeling/enemy";
 import {MovingMesh} from "@/modeling/MovingMesh";
 import {CollisionCylinder} from "@/modeling/collision-cylinder";
+import {Mesh} from "@/engine/renderer/mesh";
 
 const debugElement = document.querySelector('#debug')!;
 
@@ -32,11 +33,13 @@ class GameState implements State {
   player: ThirdPersonPlayer;
   level!: Level;
   camera: Camera;
+  isMusicKeyPressed = false;
 
   constructor() {
     this.camera = new Camera(Math.PI / 3, 16 / 9, 1, 400);
     this.player = new ThirdPersonPlayer(this.camera);
   }
+
 
   onEnter(levelCallback: LevelCallback) {
     this.level = levelCallback();
@@ -47,18 +50,10 @@ class GameState implements State {
 
     this.player.respawn();
 
-    const soundPlayer = getAudioPlayer();
-
     this.level.scene.skybox = new Skybox(...skyboxes.dayCloud);
     this.level.scene.skybox.bindGeometry();
 
     this.level.scene.add(this.player.mesh);
-
-    const audio = soundPlayer(...[, , 925, .04, .3, .6, 1, .3, , 6.27, -184, .09, .17] as const);
-
-    // audio.loop = true;
-    audio.connect(panner).connect(audioCtx.destination);
-    // audio.start();
   }
 
   onUpdate(timeElapsed: number): void {
@@ -99,6 +94,11 @@ class GameState implements State {
     if (controls.isEscape) {
       getGameStateMachine().setState(menuState);
     }
+
+    if (controls.isM && !this.isMusicKeyPressed) {
+      toggleMusic();
+    }
+    this.isMusicKeyPressed = controls.isM;
   }
 
   collideWithLevel(
@@ -111,11 +111,15 @@ class GameState implements State {
     feetCenter.z += wallCollisions.zPush;
 
     const ceilingAtPoint = findCeilingFromList(groupedFaces.ceilingFaces, feetCenter, height)
-    if (ceilingAtPoint && feetCenter.y + .1 < ceilingAtPoint.height && feetCenter.y + height > ceilingAtPoint.height) {
+    debugElement.textContent = `${ceilingAtPoint?.ceiling.isDeadly}`
+    if (ceilingAtPoint && feetCenter.y + (height /2) < ceilingAtPoint.height && feetCenter.y + height > ceilingAtPoint.height) {
       const ceilingCollisionDepth = feetCenter.y + height - ceilingAtPoint.height
       // feetCenter.y -= ceilingCollisionDepth;
       if (collisionCylinder.velocity) {
         collisionCylinder.velocity.y = 0;
+      }
+      if (ceilingAtPoint.ceiling.isDeadly) {
+        this.killPlayer(true, ceilingAtPoint.ceiling.parentMesh);
       }
     }
 
@@ -126,9 +130,21 @@ class GameState implements State {
     }
 
     const collisionDepth = floorData.height - feetCenter.y;
+    const parentMesh = floorData.floor.parentMesh;
+
+    /// floor glue logic
+    if (parentMesh && collisionDepth >= 0) {
+      if (parentMesh.isIncrease) {
+        this.player.mesh.position.add(parentMesh.movementVector)
+        this.player.feetCenter.add(parentMesh.movementVector);
+      } else {
+        this.player.mesh.position.subtract(parentMesh.movementVector);
+        this.player.feetCenter.subtract(parentMesh.movementVector)
+      }
+    }
 
     if (floorData.floor.isDeadly && collisionDepth > 0) {
-      this.killPlayer();
+      this.killPlayer(true, parentMesh, true);
     }
 
     return collisionDepth;
@@ -162,29 +178,42 @@ class GameState implements State {
     }
   }
 
-  private killPlayer(shouldShowDeadBody: boolean = true) {
+  private killPlayer(shouldShowDeadBody: boolean = true, parentMesh?: MovingMesh, isFloorDeath: boolean = false) {
     // you can only die once 🤵
     if (this.player.isDead) {
       return;
     }
-    this.player.isDead = true;
-    scores.setLevelScore(this.levelNumber, scores.getLevelScore(this.levelNumber) + 1);
-    setTimeout(() => this.respawnPlayer(shouldShowDeadBody), 3000);
-  }
 
-  respawnPlayer(shouldShowDeadBody: boolean) {
     if (shouldShowDeadBody){
       const bodyToMove = this.level.deadBodies[scores.getLevelScore(this.levelNumber) - 1];
       bodyToMove.position.set(this.player.feetCenter)
       const floorFace = findFloorHeightAtPosition(this.level.groupedFaces.floorFaces, this.player.feetCenter);
-      if (floorFace) {
+      if (floorFace && isFloorDeath) {
         bodyToMove.position.y = floorFace.height + .7;
+        this.level.dynamicMeshesToCollide.push(bodyToMove);
+      } else {
+        bodyToMove.position.y += .7;
+      }
+      if (parentMesh) {
+        parentMesh.otherMeshesToMove.push(bodyToMove);
+        parentMesh.movementVector.x -= parentMesh.movementVector.x * .4
+        parentMesh.movementVector.y -= parentMesh.movementVector.y * .4
+        parentMesh.movementVector.z -= parentMesh.movementVector.z * .4
       }
       bodyToMove.updateWorldMatrix(); // this may be unnecessary
     }
 
+    this.player.isDead = true;
+    this.player.mesh.scale.set(0, 0, 0);
+
+    scores.setLevelScore(this.levelNumber, scores.getLevelScore(this.levelNumber) + 1);
+    setTimeout(() => this.respawnPlayer(), 3000);
+  }
+
+  respawnPlayer() {
     this.level.updateAllGroupedFaces();
     this.player.respawn();
+    this.player.mesh.scale.set(1,1,1);
   }
 
   drawHUD() {
@@ -192,13 +221,6 @@ class GameState implements State {
     const halfHeight = drawEngine.height / 2;
 
     drawEngine.clearContext();
-
-    drawEngine.drawText(
-      `Hole ${ this.levelNumber }
-      Par ${ pars[this.levelNumber - 1]}
-      Current Stroke: ${ scores.getLevelScore(this.levelNumber) }`
-      , 25, halfWidth,  30);
-
 
     if (this.player.isDead) {
       drawEngine.drawText(`You Died`, 40, halfWidth, halfHeight);

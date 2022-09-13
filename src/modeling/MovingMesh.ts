@@ -11,6 +11,7 @@ export class MovingMesh extends Mesh {
   distanceTraveled = 0;
   isIncrease = true;
   movementVector: EnhancedDOMPoint;
+  otherMeshesToMove: Mesh[] = [];
 
   constructor(geometry: MoldableCubeGeometry, material: Material, movementVector: EnhancedDOMPoint, distanceToTravel: number) {
     super(geometry, material);
@@ -19,14 +20,21 @@ export class MovingMesh extends Mesh {
   }
 
   update() {
+    // assignment happens of isIncrease first so internal and external sources of truth for movement are the same
+    if (this.isIncrease) {
+      this.isIncrease = this.distanceTraveled < this.distanceToTravel;
+    } else {
+      this.isIncrease = this.distanceTraveled <= 0;
+    }
+
     if (this.isIncrease) {
       this.position.add(this.movementVector);
       this.distanceTraveled += this.movementVector.magnitude;
-      this.isIncrease = this.distanceTraveled < this.distanceToTravel;
+      this.otherMeshesToMove.forEach(mesh => mesh.position.add(this.movementVector));
     } else {
       this.position.subtract(this.movementVector);
       this.distanceTraveled -= this.movementVector.magnitude;
-      this.isIncrease = this.distanceTraveled <= 0;
+      this.otherMeshesToMove.forEach(mesh => mesh.position.subtract(this.movementVector));
     }
     this.updateWorldMatrix();
   }
