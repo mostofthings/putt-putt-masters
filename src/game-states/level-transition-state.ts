@@ -14,11 +14,11 @@ import {getLevel6} from "@/game-states/levels/level-6";
 
 class LevelTransitionState implements State {
   levels: LevelCallback[] = [
-    // getLevel1,
-    // getLevel2,
+    getLevel1,
+    getLevel2,
     getLevel3,
     getLevel4,
-    // getLevel5,
+    getLevel5,
     getLevel6,
   ];
   currentLevelNumber = -1
