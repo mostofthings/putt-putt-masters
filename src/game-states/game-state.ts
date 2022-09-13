@@ -22,12 +22,10 @@ import {drawEngine} from "@/core/draw-engine";
 import {pars} from "@/game-states/levels/pars";
 import {scores} from "@/engine/scores";
 import {levelTransitionState} from "@/game-states/level-transition-state";
-import {Enemy, isEnemy} from "@/modeling/enemy";
+import {Enemy} from "@/modeling/enemy";
 import {MovingMesh} from "@/modeling/MovingMesh";
 import {CollisionCylinder} from "@/modeling/collision-cylinder";
 import {Mesh} from "@/engine/renderer/mesh";
-
-const debugElement = document.querySelector('#debug')!;
 
 class GameState implements State {
   player: ThirdPersonPlayer;
@@ -72,13 +70,17 @@ class GameState implements State {
     this.removeStaleEnemiesFromScene();
 
     // update remaining enemies
-    this.level.enemies.forEach(enemy => enemy.update());
+    this.level.enemies.forEach(enemy => {
+      if (enemy && typeof enemy.update === 'function') {
+        enemy.update();
+      }
+    });
 
     // check player for collide with enemies; call onCollide
     this.collideWithEnemies(this.player, this.level.enemies)
 
     // check enemies for collide with each other and the player;
-    this.level.enemies.forEach(enemy => this.collideWithEnemies(enemy, [...this.level.enemies, this.player]));
+    // this.level.enemies.forEach(enemy => this.collideWithEnemies(enemy, [...this.level.enemies, this.player]));
 
     if (areCylindersColliding(this.level.hole, this.player)) {
       this.player.velocity.set(0,0,0);
@@ -165,7 +167,7 @@ class GameState implements State {
   }
 
 
-  collideWithEnemies(toCollide: ThirdPersonPlayer | Enemy, enemies: (Enemy | ThirdPersonPlayer)[]) {
+  collideWithEnemies(toCollide: ThirdPersonPlayer, enemies: (Enemy)[]) {
     for (const enemy of enemies) {
       // can't collide with itself
       if (toCollide.feetCenter === enemy.feetCenter) {
@@ -176,13 +178,14 @@ class GameState implements State {
         continue;
       }
 
-      if (isPlayer(toCollide)) {
-        if (isEnemy(enemy) && enemy.isDeadly) {
+        if (enemy.isDeadly) {
           this.killPlayer();
         }
-      } else {
-        toCollide.onCollide();
-      }
+
+
+        if (typeof enemy.onCollide === 'function') {
+          enemy.onCollide();
+        }
     }
   }
 

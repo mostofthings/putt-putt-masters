@@ -3,8 +3,6 @@ import {Material} from "@/engine/renderer/material";
 import {MoldableCubeGeometry} from "@/engine/moldable-cube-geometry";
 import {EnhancedDOMPoint} from "@/engine/enhanced-dom-point";
 
-const debugElement = document.querySelector('#debug')!;
-
 
 export class MovingMesh extends Mesh {
   distanceToTravel: number;

@@ -33,7 +33,10 @@ export function getGroupedFaces(meshes: (Mesh |  MovingMesh)[]): GroupedFaces {
       ]);
     }
 
-    return triangles.map(triangle => new Face(triangle, undefined, mesh.isDeadly, isMovingMesh(mesh) ? mesh : undefined));
+    // @ts-ignore
+    const meshToAdd = typeof mesh.update === 'function' ? mesh : undefined;
+    // @ts-ignore
+    return triangles.map(triangle => new Face(triangle, undefined, mesh.isDeadly, meshToAdd));
   }).sort((a, b) => a.upperY > b.upperY ? -1 : 1);
 
   const floorFaces: Face[] = [];

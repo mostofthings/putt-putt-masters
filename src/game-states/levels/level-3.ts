@@ -58,7 +58,7 @@ export function getLevel3() {
 
 
 
-  const staticMeshesToCollide = [...platforms, ...spikes, mine];
+  const staticMeshesToCollide = [...platforms, ...spikes];
 
   return new Level(
     3,

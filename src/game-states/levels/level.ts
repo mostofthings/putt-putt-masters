@@ -79,7 +79,9 @@ export class Level {
     }
     // move platforms and stuff
     this.dynamicMeshesToCollide.forEach(mesh => {
-      if (isMovingMesh(mesh)) {
+      // @ts-ignore
+      if (typeof mesh.update === 'function') {
+        // @ts-ignore
         mesh.update()
       }
     } );

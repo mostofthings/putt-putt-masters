@@ -12,7 +12,6 @@ const [drawContext, tileContext, noiseContext] = ['draw', 'tile', 'noise'].map(i
 });
 
 const resolution = 128;
-const debugElement = document.querySelector('#debug')!;
 
 // *********************
 // Grass

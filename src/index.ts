@@ -19,7 +19,6 @@ import { createGameStateMachine, getGameStateMachine } from '@/game-state-machin
 import { gameState } from '@/game-states/game-state';
 import { menuState } from '@/game-states/menu-state';
 
-const debugElement = document.querySelector('#debug')!;
 
 // TESTING
 drawCurrentTexture();

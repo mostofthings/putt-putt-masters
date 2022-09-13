@@ -6,6 +6,9 @@ export function findFloorHeightAtPosition(floorFaces: Face[], position: Enhanced
   let height: number;
 
   for (const floor of floorFaces) {
+    if (!floor) {
+      continue;
+    }
     const { x: x1, z: z1 } = floor.points[0];
     const { x: x2, z: z2 } = floor.points[1];
     const { x: x3, z: z3 } = floor.points[2];
@@ -99,11 +102,14 @@ export function findCeilingFromList(ceilings: Face[], position: EnhancedDOMPoint
   { height: number, ceiling: Face } | undefined {
   let height: number;
   ceilings = ceilings
-    .filter(ceiling => ceiling.upperY > position.y)
+    .filter(ceiling => !!ceiling && ceiling.upperY > position.y)
     .sort((a, b) => a.upperY < b.upperY ? -1 : 1);
 
   // Stay in this loop until out of ceilings.
   for (const ceiling of ceilings) {
+    if (!ceiling) {
+      continue;
+    }
     const { x: x1, z: z1 } = ceiling.points[0];
     const { x: x2, z: z2 } = ceiling.points[1];
     const { x: x3, z: z3 } = ceiling.points[2];

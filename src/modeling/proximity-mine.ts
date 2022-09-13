@@ -25,16 +25,15 @@ export class ProximityMine extends Enemy {
     })
     bodyGeometry.done();
 
-    const update = () => this.updateExplosion()
-    const onCollide = () => { this.explosion.isDeadly = true; }
 
-    super(feetCenter, 2, 1, bodyGeometry, new Material({color: '#666'}), update, onCollide);
+    super(feetCenter, 2, 1, bodyGeometry, new Material({color: '#666'}));
 
     const explosionGeometry = new MoldableCubeGeometry(5,5,5,5,5,5)
       .spherify(2.5)
       .scale(.05,.05,.05)
       .computeNormalsCrossPlane()
       .done();
+
 
     // explosion has same feetCenter as otherwise the mine blows itself up
     this.explosion = new Enemy(feetCenter, .25, .25, explosionGeometry, new Material({ texture: explosionTexture, isTransparent: true, emissive: '#fff' }))
@@ -56,5 +55,15 @@ export class ProximityMine extends Enemy {
       this.shouldBeRemovedFromScene = true;
       this.explosion.shouldBeRemovedFromScene = true;
     }
+  }
+
+  // @ts-ignore
+  update() {
+    this.updateExplosion();
+  }
+
+  // @ts-ignore
+  onCollide() {
+    this.explosion.isDeadly = true;
   }
 }
